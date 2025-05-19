@@ -58,6 +58,11 @@ public class ChampionshipController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newChampionship);
     }
 
+    @Operation(summary = "Delete a specific championship",
+            description = "Endpoint to show delete a specific championship registered based on its ID")
+    @ApiResponse(responseCode = "204",
+            description = "Success: Championship deleted")
+    @ApiResponse(responseCode = "404", description = "Error: Championship not found with the provided ID")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id){
         championshipService.delete(id);
