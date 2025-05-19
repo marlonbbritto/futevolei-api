@@ -2,6 +2,7 @@ package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
+import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpdateDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.repository.ChampionshipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,29 @@ public class ChampionshipService {
                     ,"Not found championship with this ID: "+id);
         }
         championshipRepository.deleteById(id);
+    }
+
+    public ChampionshipDto partialUpdateChampionship(Long id, ChampionshipUpdateDto championshipUpdateDto){
+        Optional<Championship> championshipOptional = championshipRepository.findById(id);
+
+        return championshipOptional.map(existingChampionship->{
+            if(championshipUpdateDto.name()!=null){
+                existingChampionship.setName(championshipUpdateDto.name());
+            }
+            if(championshipUpdateDto.startDate()!=null){
+                existingChampionship.setStartDate(championshipUpdateDto.startDate());
+            }
+            if(championshipUpdateDto.city()!=null){
+                existingChampionship.setCity(championshipUpdateDto.city());
+            }
+            if(championshipUpdateDto.numberOfTeams()!=null){
+                existingChampionship.setNumberOfTeams(championshipUpdateDto.numberOfTeams());
+            }
+            Championship updatedChampionship = championshipRepository.save(existingChampionship);
+            return convertEntityToDto(updatedChampionship);
+        }).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Not found championship with this ID: "+id));
+
     }
 
     public Championship convertDtoToEntity(ChampionshipInsertDto championship){

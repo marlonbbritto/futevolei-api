@@ -2,6 +2,7 @@ package com.futevolei.championship.futevolei_api.controller;
 
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
+import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpdateDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.service.ChampionshipService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -67,5 +68,17 @@ public class ChampionshipController {
     public ResponseEntity<Void> delete(@PathVariable Long id){
         championshipService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Partially update a championship by ID",
+            description = "Endpoint to update specific information of a championship. Send only the fields you want to update.")
+    @ApiResponse(responseCode = "200", description = "Success: Championship updated",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ChampionshipDto.class)))
+    @ApiResponse(responseCode = "404", description = "Error: Championship not found with the provided ID")
+    @PatchMapping(value = "/{id}")
+    public ResponseEntity<ChampionshipDto> partialUpdateChampionship(@PathVariable Long id, @RequestBody ChampionshipUpdateDto updateDto) {
+        ChampionshipDto updatedDto = championshipService.partialUpdateChampionship(id, updateDto);
+        return ResponseEntity.ok().body(updatedDto);
     }
 }
