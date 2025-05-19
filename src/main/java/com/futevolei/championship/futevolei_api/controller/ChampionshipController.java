@@ -1,5 +1,6 @@
 package com.futevolei.championship.futevolei_api.controller;
 
+import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.service.ChampionshipService;
@@ -11,16 +12,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/championship")
 public class ChampionshipController {
     @Autowired
     private ChampionshipService championshipService;
+
+    @Operation(summary = "Find all championship",
+    description = "Endpoint to show all championship registered")
+
+    @ApiResponse(responseCode = "200",
+    description = "Success to requisition")
+    @GetMapping
+    public ResponseEntity<List<ChampionshipDto>> findAll(){
+        List<ChampionshipDto> championshipDtoList = championshipService.findAll();
+        return ResponseEntity.ok().body(championshipDtoList);
+    }
 
     @Operation(summary = "Create a new championship",
             description = "Endpoint pto register a new championship in the system")

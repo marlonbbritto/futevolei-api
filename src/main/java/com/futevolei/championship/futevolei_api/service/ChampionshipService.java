@@ -7,10 +7,22 @@ import com.futevolei.championship.futevolei_api.repository.ChampionshipRepositor
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class ChampionshipService {
     @Autowired
     ChampionshipRepository championshipRepository;
+
+    public List<ChampionshipDto> findAll(){
+        List<Championship> championships = championshipRepository.findAll();
+        return championships
+                .stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+
+    }
 
     public Championship insert(ChampionshipInsertDto championship){
         return championshipRepository.save(convertDtoToEntity(championship));
@@ -23,6 +35,17 @@ public class ChampionshipService {
                 .startDate(championship.startDate())
                 .build();
         return championship1;
+    }
+
+    public ChampionshipDto convertEntityToDto(Championship championship){
+        return new ChampionshipDto(
+                championship.getId(),
+                championship.getName(),
+                championship.getStartDate(),
+                championship.getCity(),
+                championship.getNumberOfTeams()
+
+        );
     }
 
 }
