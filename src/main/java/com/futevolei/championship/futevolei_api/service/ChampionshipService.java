@@ -42,6 +42,14 @@ public class ChampionshipService {
         return championshipRepository.save(convertDtoToEntity(championship));
     }
 
+    public void delete(Long id){
+        if(!championshipRepository.existsById(id)){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND
+                    ,"Not found championship with this ID: "+id);
+        }
+        championshipRepository.deleteById(id);
+    }
+
     public Championship convertDtoToEntity(ChampionshipInsertDto championship){
         Championship championship1 = Championship.builder()
                 .name(championship.name())

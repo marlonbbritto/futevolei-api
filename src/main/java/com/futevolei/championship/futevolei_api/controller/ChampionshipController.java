@@ -57,4 +57,10 @@ public class ChampionshipController {
         Championship newChampionship = championshipService.insert(championship);
         return ResponseEntity.status(HttpStatus.CREATED).body(newChampionship);
     }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id){
+        championshipService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

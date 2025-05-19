@@ -7,8 +7,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Configuration
 @Profile("test")
@@ -37,6 +39,8 @@ public class TestConfig implements CommandLineRunner {
                 .city("Londrina")
                 .startDate(LocalDate.parse("18/12/2025",formatter))
                 .build();
+
+        championshipRepository.saveAll(List.of(championship1,championship2,championship3));
 
     }
 }
