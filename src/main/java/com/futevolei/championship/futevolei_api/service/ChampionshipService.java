@@ -5,9 +5,14 @@ import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipIns
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.repository.ChampionshipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.lang.module.ResolutionException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +27,15 @@ public class ChampionshipService {
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());
 
+    }
+
+    public ChampionshipDto findById (Long id){
+            Optional<Championship> championship = championshipRepository.findById(id);
+            return championship
+                    .map(this::convertEntityToDto)
+                    .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Not found championship with this ID: "+id)
+                    );
     }
 
     public Championship insert(ChampionshipInsertDto championship){

@@ -33,6 +33,19 @@ public class ChampionshipController {
         return ResponseEntity.ok().body(championshipDtoList);
     }
 
+    @Operation(summary = "Find a specific championship",
+            description = "Endpoint to show data of a specific championship registered based on its ID")
+    @ApiResponse(responseCode = "200",
+            description = "Success: Championship found",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ChampionshipDto.class)))
+    @ApiResponse(responseCode = "404", description = "Error: Championship not found with the provided ID")
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<ChampionshipDto> findById(@PathVariable Long id){
+        ChampionshipDto championshipDto = championshipService.findById(id);
+        return ResponseEntity.ok().body(championshipDto);
+    }
+
     @Operation(summary = "Create a new championship",
             description = "Endpoint pto register a new championship in the system")
     @ApiResponse(responseCode = "201", description = "Success to create a new championship",
