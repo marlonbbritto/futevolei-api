@@ -74,7 +74,7 @@ public class ChampionshipService {
 
     }
 
-    public Championship convertDtoToEntity(ChampionshipInsertDto championship){
+    private Championship convertDtoToEntity(ChampionshipInsertDto championship){
         Championship championship1 = Championship.builder()
                 .name(championship.name())
                 .city(championship.city())
@@ -83,7 +83,7 @@ public class ChampionshipService {
         return championship1;
     }
 
-    public ChampionshipDto convertEntityToDto(Championship championship){
+    private ChampionshipDto convertEntityToDto(Championship championship){
         return new ChampionshipDto(
                 championship.getId(),
                 championship.getName(),
