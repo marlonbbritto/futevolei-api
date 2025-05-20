@@ -16,11 +16,9 @@ import java.util.List;
 import java.util.Optional;
 
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
@@ -87,7 +85,7 @@ public class ChampionshipServiceTest {
 
     @Test
     @DisplayName("Should insert a new championship when everything is ok")
-    void insert_returnsNewChampionshipDto(){
+    void insert_ReturnsNewChampionshipDto(){
 
         ChampionshipInsertDto insertDto = new ChampionshipInsertDto(
                 "Novo Campeonato de Futevôlei",
@@ -113,6 +111,24 @@ public class ChampionshipServiceTest {
         assertEquals(insertDto.startDate(),result.getStartDate());
 
         verify(championshipRepository).save(any(Championship.class));
+
+    }
+
+    @Test
+    @DisplayName("Should delete a Championship when id exist")
+    void delete_ExistingID_DeleteChampionshipSucessfully(){
+        Long idToDelete = 1L;
+
+        when(championshipRepository.existsById(idToDelete)).thenReturn(true);
+
+        doNothing().when(championshipRepository).deleteById(idToDelete);
+
+        assertDoesNotThrow(()-> championshipService.delete(idToDelete));
+
+        verify(championshipRepository,times(1)).existsById(idToDelete);
+
+        verify(championshipRepository, times(1)).deleteById(idToDelete);
+
 
     }
 }
