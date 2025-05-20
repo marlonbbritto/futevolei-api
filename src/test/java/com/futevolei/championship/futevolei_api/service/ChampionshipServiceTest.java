@@ -1,6 +1,7 @@
 package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
+import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.repository.ChampionshipRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -14,8 +15,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -79,5 +83,36 @@ public class ChampionshipServiceTest {
         assertEquals(championship1.getCity(),resultDto.city());
         assertEquals(championship1.getStartDate(),resultDto.startDate());
         assertEquals(championship1.getNumberOfTeams(),resultDto.numberOfTeams());
+    }
+
+    @Test
+    @DisplayName("Should insert a new championship when everything is ok")
+    void insert_returnsNewChampionshipDto(){
+
+        ChampionshipInsertDto insertDto = new ChampionshipInsertDto(
+                "Novo Campeonato de Futevôlei",
+                LocalDate.of(2025,7,1),
+                "Curitiba"
+        );
+
+        Championship savedChampionship = Championship.builder()
+                .id(100L)
+                .name(insertDto.name())
+                .city(insertDto.city())
+                .startDate(insertDto.startDate())
+                .build();
+
+        when(championshipRepository.save(any(Championship.class))).thenReturn(savedChampionship);
+
+        Championship result = championshipService.insert(insertDto);
+
+        assertNotNull(result);
+        assertEquals(100L, result.getId());
+        assertEquals(insertDto.name(), result.getName());
+        assertEquals(insertDto.city(),result.getCity());
+        assertEquals(insertDto.startDate(),result.getStartDate());
+
+        verify(championshipRepository).save(any(Championship.class));
+
     }
 }
