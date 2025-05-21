@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -23,5 +25,8 @@ public class Championship implements Serializable {
     private LocalDate startDate;
     private String city;
     private Integer numberOfTeams;
+    @OneToMany(mappedBy = "championship", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Match> matches = new ArrayList<>();
+
 
 }
