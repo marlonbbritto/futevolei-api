@@ -33,4 +33,12 @@ public class PlayerService {
         );
     }
 
+    private Player convertDtoToEntity(PlayerDto playerDto){
+        return Player.builder()
+                .id(playerDto.id())
+                .name(playerDto.name())
+                .team(playerDto.team())
+                .build();
+    }
+
 }
