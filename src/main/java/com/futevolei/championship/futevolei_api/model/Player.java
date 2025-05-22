@@ -1,0 +1,23 @@
+package com.futevolei.championship.futevolei_api.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.io.Serializable;
+
+@Entity
+@Table(name = "tb_player")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
+public class Player implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+
+}
