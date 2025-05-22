@@ -1,5 +1,6 @@
 package com.futevolei.championship.futevolei_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 

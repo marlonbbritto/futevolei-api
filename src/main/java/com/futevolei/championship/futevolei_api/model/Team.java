@@ -1,5 +1,6 @@
 package com.futevolei.championship.futevolei_api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,11 +22,13 @@ public class Team implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @JsonIgnore
     @OneToMany (mappedBy = "team")
     @Builder.Default
     private List<Player> players = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "championship_id")
+    @JsonIgnore
     private Championship championship;
 
 
