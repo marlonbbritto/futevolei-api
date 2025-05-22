@@ -2,6 +2,7 @@ package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerDto;
+import com.futevolei.championship.futevolei_api.dto.player.PlayerInsertDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Player;
 import com.futevolei.championship.futevolei_api.repository.PlayerRepository;
@@ -34,6 +35,15 @@ public class PlayerService {
                 .map(this::convertEntityToDto)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Not found championship with this ID: "+id));
+    }
+
+    public PlayerDto insert(PlayerInsertDto playerInsertDto){
+        Player player = Player.builder()
+                .name(playerInsertDto.name())
+                .build();
+        playerRepository.save(player);
+        return convertEntityToDto(player);
+
     }
 
     private PlayerDto convertEntityToDto(Player player){
