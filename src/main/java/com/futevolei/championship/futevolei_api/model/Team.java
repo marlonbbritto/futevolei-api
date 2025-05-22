@@ -22,9 +22,10 @@ public class Team implements Serializable {
     private Long id;
     private String name;
     @OneToMany (mappedBy = "team")
+    @Builder.Default
     private List<Player> players = new ArrayList<>();
     @ManyToOne
-    @JoinColumn(name = "championship")
+    @JoinColumn(name = "championship_id")
     private Championship championship;
 
 

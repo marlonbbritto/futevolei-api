@@ -26,7 +26,9 @@ public class Championship implements Serializable {
     private String city;
     private Integer numberOfTeams;
     @OneToMany(mappedBy = "championship", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Match> matches = new ArrayList<>();
+    @Builder.Default
     @OneToMany(mappedBy = "championship", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Team> teams = new ArrayList<>();
 
