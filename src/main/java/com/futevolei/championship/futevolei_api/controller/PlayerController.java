@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,5 +22,11 @@ public class PlayerController {
     public ResponseEntity<List<PlayerDto>> findAll(){
         List<PlayerDto> playerDtosList = playerService.listAll();
         return ResponseEntity.ok().body(playerDtosList);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<PlayerDto> findById(@PathVariable Long id){
+        PlayerDto resultDto = playerService.findById(id);
+        return ResponseEntity.ok().body(resultDto);
     }
 }

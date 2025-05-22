@@ -6,9 +6,12 @@ import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Player;
 import com.futevolei.championship.futevolei_api.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +26,14 @@ public class PlayerService {
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());
 
+    }
+
+    public PlayerDto findById(Long id){
+        Optional<Player> playerDto = playerRepository.findById(id);
+        return playerDto
+                .map(this::convertEntityToDto)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Not found championship with this ID: "+id));
     }
 
     private PlayerDto convertEntityToDto(Player player){
