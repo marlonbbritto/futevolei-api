@@ -4,4 +4,5 @@ public enum KeyType {
     WINNERS,
     LOSER,
     FINAL,
+    SEMIFINAL_CROSSOVER
 }

@@ -24,6 +24,8 @@ public class Match implements Serializable {
     private KeyType keyType;
     @Enumerated(EnumType.STRING)
     private MatchStatus matchStatus;
+    Integer scoreTeam1;
+    Integer scoreTeam2;
     @ManyToOne
     @JoinColumn(name = "championship_id")
     private Championship championship;
