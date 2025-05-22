@@ -46,6 +46,15 @@ public class PlayerService {
 
     }
 
+    public void delete(Long id){
+        Optional<Player> player = playerRepository.findById(id);
+        if (player.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND
+                    ,"Not found player with this ID: "+id);
+        }
+        playerRepository.deleteById(id);
+    }
+
     private PlayerDto convertEntityToDto(Player player){
         return new PlayerDto(
                 player.getId(),
