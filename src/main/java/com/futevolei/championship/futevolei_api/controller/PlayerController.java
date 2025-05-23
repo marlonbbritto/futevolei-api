@@ -3,6 +3,7 @@ package com.futevolei.championship.futevolei_api.controller;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerInsertDto;
+import com.futevolei.championship.futevolei_api.dto.player.PlayerPaymentUpdateDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerUpdateDto;
 import com.futevolei.championship.futevolei_api.service.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,6 +67,12 @@ public class PlayerController {
     @PatchMapping(value = "/{id}")
     public ResponseEntity<PlayerDto> updatePlayer(@PathVariable Long id, @RequestBody PlayerUpdateDto playerUpdateDto){
         PlayerDto playerDto = playerService.update(id,playerUpdateDto);
+        return ResponseEntity.ok().body(playerDto);
+    }
+
+    @PatchMapping(value = "/paymentsUpdate/{id}")
+    public ResponseEntity<PlayerDto> paymentStatusUpdate(@PathVariable Long id, @RequestBody PlayerPaymentUpdateDto playerPaymentUpdateDto){
+        PlayerDto playerDto = playerService.paymentStatusUpdate(id,playerPaymentUpdateDto);
         return ResponseEntity.ok().body(playerDto);
     }
 

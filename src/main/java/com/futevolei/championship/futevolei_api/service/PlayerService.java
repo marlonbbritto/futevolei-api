@@ -3,9 +3,11 @@ package com.futevolei.championship.futevolei_api.service;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerInsertDto;
+import com.futevolei.championship.futevolei_api.dto.player.PlayerPaymentUpdateDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerUpdateDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Player;
+import com.futevolei.championship.futevolei_api.model.enums.Registrations;
 import com.futevolei.championship.futevolei_api.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +38,20 @@ public class PlayerService {
                 .map(this::convertEntityToDto)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Not found player with this ID: "+id));
+    }
+
+    public PlayerDto paymentStatusUpdate(Long id, PlayerPaymentUpdateDto playerPaymentUpdateDto){
+        Optional<Player> player = playerRepository.findById(id);
+        return player
+                .map(existingPlayer->{
+                    if(playerPaymentUpdateDto.registrations()!=null){
+                        existingPlayer.setRegistrations(playerPaymentUpdateDto.registrations());
+                    }
+                    Player updatedPlayer = playerRepository.save(existingPlayer);
+                    return convertEntityToDto(updatedPlayer);
+                }).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Not found player with this ID: "+id));
+
     }
 
     public PlayerDto insert(PlayerInsertDto playerInsertDto){
