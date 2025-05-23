@@ -26,9 +26,9 @@ public class PlayerController {
     private PlayerService playerService;
 
     @Operation(summary = "Find all players",
-    description = "Endpoint toshow all players registered")
+    description = "Endpoint to show all players registered")
     @ApiResponse(responseCode = "200",
-    description = "Sucess to requisition")
+    description = "Successfully retrieved all players")
     @GetMapping
     public ResponseEntity<List<PlayerDto>> findAll(){
         List<PlayerDto> playerDtosList = playerService.listAll();
@@ -49,6 +49,13 @@ public class PlayerController {
         return ResponseEntity.ok().body(resultDto);
     }
 
+    @Operation(summary = "Insert a new player",
+    description = "Endpoint to include a new player")
+
+    @ApiResponse(responseCode = "201",
+    description = "Success: new player included",
+    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PlayerDto.class)))
+
     @PostMapping()
     public ResponseEntity<PlayerDto> insertPlayer(@Valid @RequestBody PlayerInsertDto playerInsertDto){
         PlayerDto playerDto = playerService.insert(playerInsertDto);
@@ -58,11 +65,25 @@ public class PlayerController {
         return ResponseEntity.created(uri).body(playerDto);
     }
 
+    @Operation(summary = "Delete an player",
+            description = "Endpoint to delete an player")
+
+    @ApiResponse(responseCode = "204",
+            description = "No content",
+            content = @Content(mediaType = "application/json"))
+
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id){
         playerService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Update an player",
+            description = "Endpoint to update an player")
+
+    @ApiResponse(responseCode = "200",
+            description = "Success: player updated",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = PlayerDto.class)))
 
     @PatchMapping(value = "/{id}")
     public ResponseEntity<PlayerDto> updatePlayer(@PathVariable Long id, @RequestBody PlayerUpdateDto playerUpdateDto){
@@ -70,6 +91,12 @@ public class PlayerController {
         return ResponseEntity.ok().body(playerDto);
     }
 
+    @Operation(summary = "Update status of payment for an player",
+            description = "Endpoint to update status of payment for an player")
+
+    @ApiResponse(responseCode = "200",
+            description = "Success: payment updated",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = PlayerDto.class)))
     @PatchMapping(value = "/paymentsUpdate/{id}")
     public ResponseEntity<PlayerDto> paymentStatusUpdate(@PathVariable Long id, @RequestBody PlayerPaymentUpdateDto playerPaymentUpdateDto){
         PlayerDto playerDto = playerService.paymentStatusUpdate(id,playerPaymentUpdateDto);
