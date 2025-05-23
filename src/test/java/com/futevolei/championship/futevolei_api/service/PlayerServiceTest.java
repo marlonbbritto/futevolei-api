@@ -13,6 +13,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,8 +29,8 @@ public class PlayerServiceTest {
     private PlayerRepository playerRepository;
 
     @Test
-    @DisplayName("Should bring all registered players when everythin is correct")
-    void findAll_ReturnListOfPlayersDtos(){
+    @DisplayName("Should bring all registered players when everything is correct")
+    void findAll_ReturnListOfPlayersDto(){
         Player player1 = Player.builder()
                 .id(1L)
                 .name("João Silva")
@@ -49,6 +50,27 @@ public class PlayerServiceTest {
         assertEquals(2, dtoList.size());
         assertEquals("João Silva",dtoList.get(0).name());
         assertEquals("Carlos Barbosa",dtoList.get(1).name());
+    }
+
+    @Test
+    @DisplayName("Should bring specific registered player when Id exist")
+    void findById_ReturnsSpecifPlayerDto(){
+        Player player1 = Player.builder()
+                .id(1L)
+                .name("João Silva")
+                .build();
+
+        Long idToFind = player1.getId();
+
+        when(playerRepository.findById(idToFind)).thenReturn(Optional.of(player1));
+
+        PlayerDto resultDto = playerService.findById(idToFind);
+
+        assertNotNull(resultDto);
+        assertEquals(player1.getId(),resultDto.id());
+        assertEquals(player1.getName(),resultDto.name());
+        assertEquals(player1.getTeam(),resultDto.team());
+        assertEquals(player1.getRegistrations(),resultDto.registrations());
     }
 
 }
