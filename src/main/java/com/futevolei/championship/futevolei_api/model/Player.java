@@ -1,6 +1,7 @@
 package com.futevolei.championship.futevolei_api.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.futevolei.championship.futevolei_api.model.enums.Registrations;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,9 @@ public class Player implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Registrations registrations = Registrations.TO_PAY ;
     private String name;
     @ManyToOne
     @JoinColumn(name = "team_id")

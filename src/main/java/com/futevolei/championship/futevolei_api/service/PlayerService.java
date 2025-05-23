@@ -59,7 +59,8 @@ public class PlayerService {
         return new PlayerDto(
                 player.getId(),
                 player.getName(),
-                player.getTeam()
+                player.getTeam(),
+                player.getRegistrations()
         );
     }
 
