@@ -3,6 +3,7 @@ package com.futevolei.championship.futevolei_api.service;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerInsertDto;
+import com.futevolei.championship.futevolei_api.dto.player.PlayerUpdateDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Player;
 import com.futevolei.championship.futevolei_api.repository.PlayerRepository;
@@ -34,7 +35,7 @@ public class PlayerService {
         return playerDto
                 .map(this::convertEntityToDto)
                 .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Not found championship with this ID: "+id));
+                        "Not found player with this ID: "+id));
     }
 
     public PlayerDto insert(PlayerInsertDto playerInsertDto){
@@ -53,6 +54,25 @@ public class PlayerService {
                     ,"Not found player with this ID: "+id);
         }
         playerRepository.deleteById(id);
+    }
+
+    public PlayerDto update(Long id, PlayerUpdateDto playerUpdateDto){
+        Optional<Player> playerDto = playerRepository.findById(id);
+
+        return playerDto.map(existingPlayer->{
+            if(playerUpdateDto.name()!=null){
+                existingPlayer.setName(playerUpdateDto.name());
+            }
+            if(playerUpdateDto.registrations()!=null){
+                existingPlayer.setRegistrations(playerUpdateDto.registrations());
+            }
+            if(playerUpdateDto.team()!=null){
+                existingPlayer.setTeam(playerUpdateDto.team());
+            }
+            Player updatedPlayer = playerRepository.save(existingPlayer);
+            return convertEntityToDto(updatedPlayer);
+        }).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "Not found player with this ID: "+id));
     }
 
     private PlayerDto convertEntityToDto(Player player){
