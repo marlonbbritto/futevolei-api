@@ -1,11 +1,15 @@
 package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.player.PlayerDto;
+import com.futevolei.championship.futevolei_api.dto.player.PlayerPaymentUpdateDto;
+import com.futevolei.championship.futevolei_api.dto.player.PlayerUpdateDto;
 import com.futevolei.championship.futevolei_api.model.Player;
 import com.futevolei.championship.futevolei_api.model.Team;
+import com.futevolei.championship.futevolei_api.model.enums.Registrations;
 import com.futevolei.championship.futevolei_api.repository.PlayerRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -71,6 +75,31 @@ public class PlayerServiceTest {
         assertEquals(player1.getName(),resultDto.name());
         assertEquals(player1.getTeam(),resultDto.team());
         assertEquals(player1.getRegistrations(),resultDto.registrations());
+    }
+
+    @Test
+    @DisplayName("Should update payment status when Id exist and everything is correct")
+    void paymentStatusUpdate_ReturnsPlayDtoWithUpdatedPayment(){
+        Player playerEntity = Player.builder()
+                .id(1L)
+                .name("João Silva")
+                .build();
+        Long playerId = playerEntity.getId();
+
+        PlayerPaymentUpdateDto playerUpdatDto = new PlayerPaymentUpdateDto(Registrations.PAID);
+
+        when(playerRepository.findById(playerId)).thenReturn(Optional.of(playerEntity));
+        when(playerRepository.save(any(Player.class))).thenAnswer((InvocationOnMock invocation) -> {
+            return invocation.getArgument(0);
+        });
+
+        PlayerDto resultDto = playerService.paymentStatusUpdate(playerId,playerUpdatDto);
+
+        assertNotNull(resultDto);
+        assertEquals(Registrations.PAID,resultDto.registrations());
+        assertEquals(playerId,resultDto.id());
+        assertEquals("João Silva",resultDto.name());
+        assertNull(resultDto.team());
     }
 
 }

@@ -1,13 +1,10 @@
 package com.futevolei.championship.futevolei_api.service;
 
-import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerInsertDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerPaymentUpdateDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerUpdateDto;
-import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Player;
-import com.futevolei.championship.futevolei_api.model.enums.Registrations;
 import com.futevolei.championship.futevolei_api.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
