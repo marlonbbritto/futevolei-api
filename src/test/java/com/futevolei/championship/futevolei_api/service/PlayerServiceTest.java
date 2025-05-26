@@ -124,4 +124,25 @@ public class PlayerServiceTest {
         assertEquals(entityPlayer.getId(),resultDto.id());
 
     }
+
+    @Test
+    @DisplayName("Should delete an specific Player when Id exist and everything is correct")
+    void deletePlayer_ReturnNoContent(){
+        Player entityPlayer = Player.builder()
+                .id(1L)
+                .name("Juliana Cardoso")
+                .build();
+        Long idToFind = entityPlayer.getId();
+
+
+        when(playerRepository.findById(idToFind)).thenReturn(Optional.of(entityPlayer));
+        doNothing().when(playerRepository).deleteById(idToFind);
+
+        assertDoesNotThrow(() -> playerService.delete(idToFind));
+
+        verify(playerRepository,times(1)).findById(idToFind);
+        verify(playerRepository,times(1)).deleteById(idToFind);
+
+
+    }
 }
