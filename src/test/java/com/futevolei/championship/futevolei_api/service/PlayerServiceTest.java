@@ -145,4 +145,44 @@ public class PlayerServiceTest {
 
 
     }
+
+    @Test
+    @DisplayName("Should update a specific Player when Id exist and everything is correct")
+    void update_ReturnUpdateDto(){
+        Player entityPlayer = Player.builder()
+                .id(1L)
+                .name("Juliana Cardoso")
+                .registrations(Registrations.TO_PAY)
+                .team(null)
+                .build();
+        Long idToFind = entityPlayer.getId();
+
+        PlayerUpdateDto updatedDto = new PlayerUpdateDto(
+                "Juliana Cardoso Britto",
+                null,
+                Registrations.PAID
+        );
+
+        Player entityPlayerUpdated = Player.builder()
+                        .id(idToFind)
+                        .name(updatedDto.name())
+                        .registrations(updatedDto.registrations())
+                        .team(null)
+                        .build();
+
+        when(playerRepository.findById(idToFind)).thenReturn(Optional.of(entityPlayer));
+        when(playerRepository.save(any(Player.class))).thenReturn(entityPlayerUpdated);
+        PlayerDto result = playerService.update(idToFind,updatedDto);
+
+        assertNotNull(result);
+        assertEquals(result.id(),entityPlayerUpdated.getId());
+        assertEquals(result.name(),entityPlayerUpdated.getName());
+        assertEquals(result.team(),entityPlayerUpdated.getTeam());
+        assertEquals(result.registrations(),entityPlayerUpdated.getRegistrations());
+
+        verify(playerRepository, times(1)).findById(idToFind);
+        verify(playerRepository, times(1)).save(any(Player.class));
+
+
+    }
 }
