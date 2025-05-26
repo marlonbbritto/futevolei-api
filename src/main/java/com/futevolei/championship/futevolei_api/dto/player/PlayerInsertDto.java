@@ -8,9 +8,7 @@ import jakarta.validation.constraints.Size;
 public record PlayerInsertDto(
         @NotBlank(message = "O nome do jogador é obrigatório.")
         @Size(min = 3, max = 100, message = "O nome do jogador deve ter entre 3 e 100 caracteres.")
-        String name,
-        Registrations registrations,
-        Team team
+        String name
 
 ) {
 }

@@ -55,8 +55,8 @@ public class PlayerService {
         Player player = Player.builder()
                 .name(playerInsertDto.name())
                 .build();
-        playerRepository.save(player);
-        return convertEntityToDto(player);
+        Player savedPlayer = playerRepository.save(player);
+        return convertEntityToDto(savedPlayer);
 
     }
 

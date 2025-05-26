@@ -1,6 +1,7 @@
 package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.player.PlayerDto;
+import com.futevolei.championship.futevolei_api.dto.player.PlayerInsertDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerPaymentUpdateDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerUpdateDto;
 import com.futevolei.championship.futevolei_api.model.Player;
@@ -102,4 +103,25 @@ public class PlayerServiceTest {
         assertNull(resultDto.team());
     }
 
+    @Test
+    @DisplayName("Shoul insert new Player when everthing is correct")
+    void insertPlayer_ReturnNewPlayerDto(){
+        PlayerInsertDto playerInsertDto = new PlayerInsertDto(
+                "Juliana Cardoso"
+        );
+        Player entityPlayer = Player.builder()
+                .id(1L)
+                .name("Juliana Cardoso")
+                .build();
+
+        when(playerRepository.save(any(Player.class))).thenReturn(entityPlayer);
+
+        PlayerDto resultDto = playerService.insert(playerInsertDto);
+
+        assertEquals(entityPlayer.getName(),resultDto.name());
+        assertEquals(entityPlayer.getTeam(),resultDto.team());
+        assertEquals(entityPlayer.getRegistrations(),resultDto.registrations());
+        assertEquals(entityPlayer.getId(),resultDto.id());
+
+    }
 }
