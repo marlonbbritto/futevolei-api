@@ -3,13 +3,16 @@ package com.futevolei.championship.futevolei_api.service;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerSummaryDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamDto;
+import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Team;
 import com.futevolei.championship.futevolei_api.repository.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +28,13 @@ public class TeamService {
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());
 
+    }
+
+    public TeamDto findById(Long id){
+        Optional<Team> team = teamRepository.findById(id);
+        return team
+                .map(this::convertEntityToDto)
+                .orElseThrow(()->new ResourceNotFoundException("Team", "ID",id));
     }
 
     public TeamDto convertEntityToDto(Team team){

@@ -16,8 +16,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -79,6 +81,50 @@ public class TeamServiceTest {
         assertEquals(teamList.get(1).getChampionship().getId(),resultList.get(1).championship().id());
         assertEquals(teamList.get(1).getPlayers().size(),resultList.get(1).players().size());
 
+
+    }
+
+    @Test
+    @DisplayName("Should bring an specifi Team when ID exist and everything is ok")
+    void findById_ReturnSpecifTeamDto(){
+        Player player1 = Player.builder()
+                .id(2L)
+                .name("João Silva")
+                .build();
+        Player player2 = Player.builder()
+                .id(3L)
+                .name("Carlos Souza")
+                .build();
+        Championship championship = Championship.builder()
+                .id(3L)
+                .name("Campeonato 1")
+                .numberOfTeams(10)
+                .startDate(LocalDate.of(2025,11,11))
+                .city("Maringá")
+                .build();
+        Team team1 = Team.builder()
+                .id(1L)
+                .name("Time 1")
+                .championship(championship)
+                .players(List.of(player1,player2))
+                .build();
+        Long idToFind = team1.getId();
+
+        when(teamRepository.findById(idToFind)).thenReturn(Optional.of(team1));
+
+        TeamDto resultDto = teamService.findById(idToFind);
+
+        assertNotNull(resultDto);
+        assertEquals(team1.getId(),resultDto.id());
+        assertEquals(team1.getName(),resultDto.name());
+        assertEquals(team1.getChampionship().getId(),resultDto.championship().id());
+        assertEquals(team1.getPlayers().size(),resultDto.players().size());
+        assertEquals(team1.getPlayers().get(0).getId(),resultDto.players().get(0).id());
+        assertEquals(team1.getPlayers().get(0).getName(),resultDto.players().get(0).name());
+        assertEquals(team1.getPlayers().get(0).getRegistrations(),resultDto.players().get(0).registrations());
+        assertEquals(team1.getPlayers().get(1).getId(),resultDto.players().get(1).id());
+        assertEquals(team1.getPlayers().get(1).getName(),resultDto.players().get(1).name());
+        assertEquals(team1.getPlayers().get(1).getRegistrations(),resultDto.players().get(1).registrations());
 
     }
 }
