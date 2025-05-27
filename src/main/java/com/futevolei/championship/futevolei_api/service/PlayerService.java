@@ -4,6 +4,7 @@ import com.futevolei.championship.futevolei_api.dto.player.PlayerDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerInsertDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerPaymentUpdateDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerUpdateDto;
+import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Player;
 import com.futevolei.championship.futevolei_api.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +34,7 @@ public class PlayerService {
         Optional<Player> playerDto = playerRepository.findById(id);
         return playerDto
                 .map(this::convertEntityToDto)
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Not found player with this ID: "+id));
+                .orElseThrow(()-> new ResourceNotFoundException("Player","ID",id));
     }
 
     public PlayerDto paymentStatusUpdate(Long id, PlayerPaymentUpdateDto playerPaymentUpdateDto){
@@ -46,8 +46,7 @@ public class PlayerService {
                     }
                     Player updatedPlayer = playerRepository.save(existingPlayer);
                     return convertEntityToDto(updatedPlayer);
-                }).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Not found player with this ID: "+id));
+                }).orElseThrow(()->new ResourceNotFoundException("Player","ID",id));
 
     }
 
@@ -63,8 +62,7 @@ public class PlayerService {
     public void delete(Long id){
         Optional<Player> player = playerRepository.findById(id);
         if (player.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND
-                    ,"Not found player with this ID: "+id);
+            throw new ResourceNotFoundException("Player","ID",id);
         }
         playerRepository.deleteById(id);
     }
@@ -84,8 +82,7 @@ public class PlayerService {
             }
             Player updatedPlayer = playerRepository.save(existingPlayer);
             return convertEntityToDto(updatedPlayer);
-        }).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Not found player with this ID: "+id));
+        }).orElseThrow(()->new ResourceNotFoundException("Player","ID",id));
     }
 
     private PlayerDto convertEntityToDto(Player player){

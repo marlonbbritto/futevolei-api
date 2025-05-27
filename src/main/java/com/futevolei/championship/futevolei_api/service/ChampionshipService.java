@@ -3,6 +3,7 @@ package com.futevolei.championship.futevolei_api.service;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpdateDto;
+import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.repository.ChampionshipRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,8 @@ public class ChampionshipService {
             Optional<Championship> championship = championshipRepository.findById(id);
             return championship
                     .map(this::convertEntityToDto)
-                    .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Not found championship with this ID: "+id)
-                    );
+                    .orElseThrow(()-> new ResourceNotFoundException("Championship","ID", id));
+
     }
 
     public Championship insert(ChampionshipInsertDto championship){
@@ -45,8 +45,7 @@ public class ChampionshipService {
 
     public void delete(Long id){
         if(!championshipRepository.existsById(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND
-                    ,"Not found championship with this ID: "+id);
+            throw new ResourceNotFoundException("Championship","ID", id);
         }
         championshipRepository.deleteById(id);
     }
@@ -69,8 +68,7 @@ public class ChampionshipService {
             }
             Championship updatedChampionship = championshipRepository.save(existingChampionship);
             return convertEntityToDto(updatedChampionship);
-        }).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                "Not found championship with this ID: "+id));
+        }).orElseThrow(()-> new  ResourceNotFoundException("Championship","ID", id));
 
     }
 
