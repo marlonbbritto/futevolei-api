@@ -1,9 +1,11 @@
 package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.team.TeamDto;
+import com.futevolei.championship.futevolei_api.dto.team.TeamInsertDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Player;
 import com.futevolei.championship.futevolei_api.model.Team;
+import com.futevolei.championship.futevolei_api.repository.ChampionshipRepository;
 import com.futevolei.championship.futevolei_api.repository.TeamRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +22,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -31,6 +34,9 @@ public class TeamServiceTest {
 
     @MockitoBean
     private  TeamRepository teamRepository;
+
+    @MockitoBean
+    private ChampionshipRepository championshipRepository;
 
     @Test
     @DisplayName("Should bring all registered teams when everythin is correct")
@@ -125,6 +131,48 @@ public class TeamServiceTest {
         assertEquals(team1.getPlayers().get(1).getId(),resultDto.players().get(1).id());
         assertEquals(team1.getPlayers().get(1).getName(),resultDto.players().get(1).name());
         assertEquals(team1.getPlayers().get(1).getRegistrations(),resultDto.players().get(1).registrations());
+
+    }
+
+    @Test
+    @DisplayName("Should inser a new team when everything is ok")
+    void insert_ReturnNewTeamDTO(){
+        Championship championship = Championship.builder()
+                .id(1L)
+                .name("Campeonato 1")
+                .numberOfTeams(10)
+                .startDate(LocalDate.of(2025,11,11))
+                .city("Maringá")
+                .build();
+
+        TeamInsertDto insertDto = new TeamInsertDto(
+                "O melhor time",
+                1L
+        );
+
+        Team team = Team.builder()
+                .id(1L)
+                .name("O melhor time")
+                .championship(championship)
+                .build();
+
+        when(championshipRepository.findById(1L)).thenReturn(Optional.of(championship));
+        when(teamRepository.save(any(Team.class))).thenReturn(team);
+
+        TeamDto result = teamService.insert(insertDto);
+
+        assertNotNull(result);
+        assertEquals(result.id(),team.getId());
+        assertEquals(result.players().size(),team.getPlayers().size());
+        assertEquals(result.name(),team.getName());
+        assertEquals(result.championship().id(),team.getChampionship().getId());
+        assertEquals(result.championship().name(),team.getChampionship().getName());
+        assertEquals(result.championship().numberOfTeams(),team.getChampionship().getNumberOfTeams());
+        assertEquals(result.championship().city(),team.getChampionship().getCity());
+        assertEquals(result.championship().startDate(),team.getChampionship().getStartDate());
+
+        verify(championshipRepository,times(1)).findById(insertDto.championshipId());
+        verify(teamRepository, times(1)).save(any(Team.class));
 
     }
 }
