@@ -4,6 +4,7 @@ import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto
 import com.futevolei.championship.futevolei_api.dto.player.PlayerSummaryDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamInsertDto;
+import com.futevolei.championship.futevolei_api.dto.team.TeamUpdateDto;
 import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Team;
@@ -11,6 +12,7 @@ import com.futevolei.championship.futevolei_api.repository.ChampionshipRepositor
 import com.futevolei.championship.futevolei_api.repository.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -58,6 +60,24 @@ public class TeamService {
         Team teamToDelete = teamRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Team", "ID",id));
         teamRepository.delete(teamToDelete);
+    }
+
+    @Transactional
+    public TeamDto updateTeam(Long id, TeamUpdateDto teamUpdateDto){
+        Team teamToUpdate = teamRepository.findById(id)
+                .orElseThrow(()->new ResourceNotFoundException("Team","ID", id));
+        if (teamUpdateDto.name()!=null && !teamUpdateDto.name().isBlank()){
+            teamToUpdate.setName(teamUpdateDto.name());
+        }
+        if (teamUpdateDto.championshipId()!=null){
+            Championship championship = championshipRepository.findById(teamUpdateDto.championshipId())
+                    .orElseThrow(()->new ResourceNotFoundException("Championship","ID",teamUpdateDto.championshipId()));
+            teamToUpdate.setChampionship(championship);
+        }else {
+            teamToUpdate.setChampionship(null);
+        }
+        teamRepository.save(teamToUpdate);
+        return convertEntityToDto(teamToUpdate);
     }
 
     public TeamDto convertEntityToDto(Team team){
