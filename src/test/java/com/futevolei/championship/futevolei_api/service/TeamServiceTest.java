@@ -2,6 +2,7 @@ package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.team.TeamDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamInsertDto;
+import com.futevolei.championship.futevolei_api.dto.team.TeamUpdateDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Player;
 import com.futevolei.championship.futevolei_api.model.Team;
@@ -43,15 +44,19 @@ public class TeamServiceTest {
         Player player1 = Player.builder()
                 .name("João Silva")
                 .build();
+
         Player player2 = Player.builder()
                 .name("Carlos Souza")
                 .build();
+
         Player player3 = Player.builder()
                 .name("Eduardo Santos")
                 .build();
+
         Player player4 = Player.builder()
                 .name("Rafael Barbosa")
                 .build();
+
         Championship championship = Championship.builder()
                 .name("Campeonato 1")
                 .numberOfTeams(10)
@@ -64,6 +69,7 @@ public class TeamServiceTest {
                 .championship(championship)
                 .players(List.of(player1,player2))
                 .build();
+
         Team team2 = Team.builder()
                 .name("Time 2")
                 .championship(championship)
@@ -96,10 +102,12 @@ public class TeamServiceTest {
                 .id(2L)
                 .name("João Silva")
                 .build();
+
         Player player2 = Player.builder()
                 .id(3L)
                 .name("Carlos Souza")
                 .build();
+
         Championship championship = Championship.builder()
                 .id(3L)
                 .name("Campeonato 1")
@@ -107,12 +115,14 @@ public class TeamServiceTest {
                 .startDate(LocalDate.of(2025,11,11))
                 .city("Maringá")
                 .build();
+
         Team team1 = Team.builder()
                 .id(1L)
                 .name("Time 1")
                 .championship(championship)
                 .players(List.of(player1,player2))
                 .build();
+
         Long idToFind = team1.getId();
 
         when(teamRepository.findById(idToFind)).thenReturn(Optional.of(team1));
@@ -185,12 +195,15 @@ public class TeamServiceTest {
                 .startDate(LocalDate.of(2025,11,11))
                 .city("Maringá")
                 .build();
+
         Team teamToDelete = Team.builder()
                 .id(1L)
                 .name("O time para deletar")
                 .championship(championship)
                 .build();
+
         Long idToDelete = teamToDelete.getId();
+
         when(teamRepository.findById(idToDelete)).thenReturn(Optional.of(teamToDelete));
         doNothing().when(teamRepository).delete(teamToDelete);
 
@@ -199,6 +212,65 @@ public class TeamServiceTest {
         verify(teamRepository,times(1)).findById(idToDelete);
         verify(teamRepository,times(1)).delete(teamToDelete);
 
+
+    }
+    @Test
+    @DisplayName("Should update a Team when informations was send and everything is correct")
+    void updateTeam_ReturnTeamUpdatedDtoWhenEverythingCorrect(){
+        Championship championshipInitial = Championship.builder()
+                .id(1L)
+                .name("Campeonato 1")
+                .numberOfTeams(10)
+                .startDate(LocalDate.of(2025,11,11))
+                .city("Maringá")
+                .build();
+
+        Championship championshipForUpdate = Championship.builder()
+                .id(2L)
+                .name("Campeonato 2")
+                .numberOfTeams(12)
+                .startDate(LocalDate.of(2025,10,10))
+                .city("Londrina")
+                .build();
+
+        Team teamFromRepository = Team.builder()
+                .id(1L)
+                .name("O time para atualizar")
+                .championship(championshipInitial)
+                .build();
+
+        Long teamIdToUpdate = teamFromRepository.getId();
+
+        TeamUpdateDto inputDto = new TeamUpdateDto(
+                "O time ATUALIZADO",
+                2L
+        );
+
+        Team expectedTeamStateAfterSave = Team.builder()
+                .id(teamIdToUpdate)
+                .name(inputDto.name())
+                .championship(championshipForUpdate)
+                .build();
+
+        when(teamRepository.findById(teamIdToUpdate)).thenReturn(Optional.of(teamFromRepository));
+        when(championshipRepository.findById(2L)).thenReturn(Optional.of(championshipForUpdate));
+        when(teamRepository.save(any(Team.class))).thenReturn(expectedTeamStateAfterSave);
+
+        TeamDto resultDto = teamService.updateTeam(teamIdToUpdate, inputDto);
+
+        assertNotNull(resultDto);
+        assertNotNull(resultDto);
+        // Comparando o ID do DTO retornado com o ID esperado (que não muda)
+        assertEquals(teamIdToUpdate, resultDto.id());
+        assertEquals(expectedTeamStateAfterSave.getName(), resultDto.name());
+        assertNotNull(resultDto.championship());
+        assertEquals(expectedTeamStateAfterSave.getChampionship().getId(), resultDto.championship().id());
+        assertEquals(expectedTeamStateAfterSave.getChampionship().getName(), resultDto.championship().name());
+
+
+
+        verify(teamRepository,times(1)).findById(teamIdToUpdate);
+        verify(championshipRepository,times(1)).findById(inputDto.championshipId());
 
     }
 }
