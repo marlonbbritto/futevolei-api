@@ -20,8 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -173,6 +172,33 @@ public class TeamServiceTest {
 
         verify(championshipRepository,times(1)).findById(insertDto.championshipId());
         verify(teamRepository, times(1)).save(any(Team.class));
+
+    }
+
+    @Test
+    @DisplayName("Should delete an specific team when Id exist and everythin ok")
+    void delete_VoidDeleteAnTeam(){
+        Championship championship = Championship.builder()
+                .id(1L)
+                .name("Campeonato 1")
+                .numberOfTeams(10)
+                .startDate(LocalDate.of(2025,11,11))
+                .city("Maringá")
+                .build();
+        Team teamToDelete = Team.builder()
+                .id(1L)
+                .name("O time para deletar")
+                .championship(championship)
+                .build();
+        Long idToDelete = teamToDelete.getId();
+        when(teamRepository.findById(idToDelete)).thenReturn(Optional.of(teamToDelete));
+        doNothing().when(teamRepository).delete(teamToDelete);
+
+        assertDoesNotThrow(()->teamService.delete(idToDelete));
+
+        verify(teamRepository,times(1)).findById(idToDelete);
+        verify(teamRepository,times(1)).delete(teamToDelete);
+
 
     }
 }

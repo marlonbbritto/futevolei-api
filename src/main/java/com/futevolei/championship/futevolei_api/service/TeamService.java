@@ -54,6 +54,12 @@ public class TeamService {
 
     }
 
+    public void delete(Long id){
+        Team teamToDelete = teamRepository.findById(id)
+                .orElseThrow(()->new ResourceNotFoundException("Team", "ID",id));
+        teamRepository.delete(teamToDelete);
+    }
+
     public TeamDto convertEntityToDto(Team team){
         List<PlayerSummaryDto> playerSummaryDtosList = team.getPlayers()
                 .stream()
@@ -83,5 +89,6 @@ public class TeamService {
                 championshipDto
         );
     }
+
 
 }
