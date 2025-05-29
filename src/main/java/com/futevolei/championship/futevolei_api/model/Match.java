@@ -3,6 +3,8 @@ package com.futevolei.championship.futevolei_api.model;
 import com.futevolei.championship.futevolei_api.model.enums.KeyType;
 import com.futevolei.championship.futevolei_api.model.enums.MatchStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.io.Serializable;
@@ -26,6 +28,7 @@ public class Match implements Serializable {
     private MatchStatus matchStatus;
     Integer scoreTeam1;
     Integer scoreTeam2;
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "championship_id")
     private Championship championship;

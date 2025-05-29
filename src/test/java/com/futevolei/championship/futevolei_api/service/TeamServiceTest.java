@@ -39,7 +39,7 @@ public class TeamServiceTest {
     private ChampionshipRepository championshipRepository;
 
     @Test
-    @DisplayName("Should bring all registered teams when everythin is correct")
+    @DisplayName("Should bring all registered teams when everything is correct")
     void findAll_ReturnListOfTeamsDto(){
         Player player1 = Player.builder()
                 .name("João Silva")
