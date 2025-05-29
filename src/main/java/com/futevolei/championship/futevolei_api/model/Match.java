@@ -29,8 +29,17 @@ public class Match implements Serializable {
     @ManyToOne
     @JoinColumn(name = "championship_id")
     private Championship championship;
-
-
-
+    @ManyToOne
+    @JoinColumn(name = "team1_id")
+    private Team team1;
+    @ManyToOne
+    @JoinColumn(name = "team2_id")
+    private Team team2;
+    @ManyToOne
+    @JoinColumn(name = "winner_team_id", nullable = true)
+    private Team winner;
+    @ManyToOne
+    @JoinColumn(name = "loser_team_id", nullable = true)
+    private Team loser;
 
 }
