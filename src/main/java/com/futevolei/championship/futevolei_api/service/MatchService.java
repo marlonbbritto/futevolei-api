@@ -3,12 +3,14 @@ package com.futevolei.championship.futevolei_api.service;
 import com.futevolei.championship.futevolei_api.dto.MatchDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipSummaryDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamSummaryDto;
+import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Match;
 import com.futevolei.championship.futevolei_api.repository.MatchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,13 @@ public class MatchService {
                 .stream()
                 .map(this::convertEntityToMatch)
                 .collect(Collectors.toList());
+    }
+
+    public MatchDto findById(Long id){
+        Optional<Match> match = matchRepository.findById(id);
+        return match
+                .map(this::convertEntityToMatch)
+                .orElseThrow(()->new ResourceNotFoundException("Match","ID",id));
     }
 
     public MatchDto convertEntityToMatch(Match match){

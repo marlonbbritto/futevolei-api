@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -193,6 +194,92 @@ public class MatchServiceTest {
 
         verify(matchRepository,times(1)).findAll();
 
+    }
+
+    @Test
+    @DisplayName("Should bring an specific Match when Id exist and everything is correct")
+    void findById_ReturnSpecificMatchDto(){
+        Championship championshipTest = Championship.builder()
+                .name("Campeonato Teste")
+                .city("Maringá")
+                .startDate(LocalDate.of(2025,11,11))
+                .numberOfTeams(2)
+                .id(1L)
+                .build();
+
+        Player player1 = Player.builder()
+                .id(1L)
+                .name("Marlon Britto")
+                .registrations(Registrations.PAID)
+                .build();
+
+        Player player2 = Player.builder()
+                .id(2L)
+                .name("Carlos Silva")
+                .registrations(Registrations.PAID)
+                .build();
+
+        Player player3 = Player.builder()
+                .id(3L)
+                .name("Eduardo Santos")
+                .registrations(Registrations.PAID)
+                .build();
+
+        Player player4 = Player.builder()
+                .id(4L)
+                .name("João Silva")
+                .registrations(Registrations.PAID)
+                .build();
+
+        Team team1 = Team.builder()
+                .id(1L)
+                .name("Team 1")
+                .build();
+
+        Team team2 = Team.builder()
+                .id(2L)
+                .name("Team 2")
+                .build();
+
+        team1.setChampionship(championshipTest);
+        team2.setChampionship(championshipTest);
+        team1.setPlayers(List.of(player1,player2));
+        team2.setPlayers(List.of(player3,player4));
+
+        Match matchDb = Match.builder()
+                .id(1L)
+                .matchStatus(MatchStatus.IN_PROGRESS)
+                .round(1)
+                .team1(team1)
+                .team2(team2)
+                .championship(championshipTest)
+                .scoreTeam1(18)
+                .scoreTeam2(12)
+                .winner(team1)
+                .loser(team2)
+                .keyType(KeyType.WINNERS)
+                .build();
+
+        Long idMatchToFind = matchDb.getId();
+
+        when(matchRepository.findById(idMatchToFind)).thenReturn(Optional.of(matchDb));
+
+        MatchDto resultMatchDto = matchService.findById(idMatchToFind);
+
+        assertNotNull(resultMatchDto);
+        assertEquals(matchDb.getId(),resultMatchDto.id());
+        assertEquals(matchDb.getRound(),resultMatchDto.round());
+        assertEquals(matchDb.getKeyType(),resultMatchDto.keyType());
+        assertEquals(matchDb.getMatchStatus(),resultMatchDto.matchStatus());
+        assertEquals(matchDb.getScoreTeam1(),resultMatchDto.scoreTeam1());
+        assertEquals(matchDb.getScoreTeam2(),resultMatchDto.scoreTeam2());
+        assertEquals(matchDb.getChampionship().getId(),resultMatchDto.championship().id());
+        assertEquals(matchDb.getTeam1().getId(),resultMatchDto.team1().id());
+        assertEquals(matchDb.getTeam2().getId(),resultMatchDto.team2().id());
+        assertEquals(matchDb.getWinner().getId(),resultMatchDto.winner().id());
+        assertEquals(matchDb.getLoser().getId(),resultMatchDto.loser().id());
+
+        verify(matchRepository,times(1)).findById(idMatchToFind);
     }
 
 }
