@@ -3,13 +3,17 @@ package com.futevolei.championship.futevolei_api.service;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpdateDto;
+import com.futevolei.championship.futevolei_api.dto.team.TeamDto;
 import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Championship;
+import com.futevolei.championship.futevolei_api.model.Team;
 import com.futevolei.championship.futevolei_api.repository.ChampionshipRepository;
+import com.futevolei.championship.futevolei_api.repository.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.module.ResolutionException;
@@ -21,6 +25,9 @@ import java.util.stream.Collectors;
 public class ChampionshipService {
     @Autowired
     ChampionshipRepository championshipRepository;
+
+    @Autowired
+    TeamRepository teamRepository;
 
     public List<ChampionshipDto> findAll(){
         List<Championship> championships = championshipRepository.findAll();
@@ -39,10 +46,12 @@ public class ChampionshipService {
 
     }
 
+    @Transactional
     public Championship insert(ChampionshipInsertDto championship){
         return championshipRepository.save(convertDtoToEntity(championship));
     }
 
+    @Transactional
     public void delete(Long id){
         if(!championshipRepository.existsById(id)){
             throw new ResourceNotFoundException("Championship","ID", id);
@@ -50,6 +59,7 @@ public class ChampionshipService {
         championshipRepository.deleteById(id);
     }
 
+    @Transactional
     public ChampionshipDto partialUpdateChampionship(Long id, ChampionshipUpdateDto championshipUpdateDto){
         Optional<Championship> championshipOptional = championshipRepository.findById(id);
 
@@ -63,12 +73,37 @@ public class ChampionshipService {
             if(championshipUpdateDto.city()!=null){
                 existingChampionship.setCity(championshipUpdateDto.city());
             }
-            if(championshipUpdateDto.numberOfTeams()!=null){
-                existingChampionship.setNumberOfTeams(championshipUpdateDto.numberOfTeams());
-            }
             Championship updatedChampionship = championshipRepository.save(existingChampionship);
             return convertEntityToDto(updatedChampionship);
         }).orElseThrow(()-> new  ResourceNotFoundException("Championship","ID", id));
+
+    }
+
+    @Transactional
+    public ChampionshipDto insertTeamInChampionship (Long idChampionship, Long idTeam){
+        Championship championshipDbToInsertTeam = championshipRepository
+                .findById(idChampionship)
+                .orElseThrow(()->new ResourceNotFoundException("Championship","ID",idChampionship));
+
+        Team teamToInsertInChampionship = teamRepository
+                .findById(idTeam)
+                .orElseThrow(()-> new ResourceNotFoundException("Team","ID",idTeam));
+
+        championshipDbToInsertTeam.getTeams().add(teamToInsertInChampionship);
+
+        updateNumberOfTeamsInChampionship(championshipDbToInsertTeam);
+
+        teamToInsertInChampionship.setChampionship(championshipDbToInsertTeam);
+
+        teamRepository.save(teamToInsertInChampionship);
+
+        championshipRepository.save(championshipDbToInsertTeam);
+
+        return convertEntityToDto(championshipDbToInsertTeam);
+    }
+
+    private void updateNumberOfTeamsInChampionship(Championship championship){
+        championship.setNumberOfTeams(championship.getTeams().size());
 
     }
 

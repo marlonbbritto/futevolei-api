@@ -4,7 +4,10 @@ import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpdateDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
+import com.futevolei.championship.futevolei_api.model.Player;
+import com.futevolei.championship.futevolei_api.model.Team;
 import com.futevolei.championship.futevolei_api.repository.ChampionshipRepository;
+import com.futevolei.championship.futevolei_api.repository.TeamRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,9 @@ public class ChampionshipServiceTest {
 
     @MockitoBean
     private ChampionshipRepository championshipRepository;
+
+    @MockitoBean
+    private TeamRepository teamRepository;
 
     @Test
     @DisplayName("Should bring all registered championships when everything is correct.")
@@ -131,6 +137,66 @@ public class ChampionshipServiceTest {
         verify(championshipRepository,times(1)).existsById(idToDelete);
 
         verify(championshipRepository, times(1)).deleteById(idToDelete);
+
+
+    }
+
+    @Test
+    @DisplayName("Should insert an specific Team in an specific Championship when IDs exists and everything is correct")
+    void insertTeamInChampionship_ReturnUpdatedChampionshipDto_withNumberOfTeamsUpdated(){
+
+        Championship existingChampionshipInDb = Championship.builder()
+                .id(100L)
+                .name("Championship Test")
+                .city("Maringá")
+                .startDate(LocalDate.of(2025,11,11))
+                .build();
+
+        Player player1 = Player.builder()
+                .id(1L)
+                .name("João Silva")
+                .build();
+
+        Player player2 = Player.builder()
+                .id(2L)
+                .name("Carlos Souza")
+                .build();
+
+        Team team1 = Team.builder()
+                .id(1L)
+                .name("Time 1")
+                .players(List.of(player1,player2))
+                .build();
+
+        Championship expectedUpdatedChampionshipInDb = Championship.builder()
+                .id(100L)
+                .name("Championship Test")
+                .city("Maringá")
+                .startDate(LocalDate.of(2025,11,11))
+                .numberOfTeams(1)
+                .teams(List.of(team1))
+                .build();
+
+        Long idOfChampionshipToFind = existingChampionshipInDb.getId();
+        Long idOfTeamToFind = team1.getId();
+
+        when(championshipRepository.findById(idOfChampionshipToFind)).thenReturn(Optional.of(existingChampionshipInDb));
+        when(teamRepository.findById(idOfTeamToFind)).thenReturn(Optional.of(team1));
+
+        ChampionshipDto resultDtoChampionshipUpdated = championshipService.insertTeamInChampionship(idOfChampionshipToFind,idOfTeamToFind);
+
+        assertNotNull(resultDtoChampionshipUpdated);
+        assertEquals(resultDtoChampionshipUpdated.id(),expectedUpdatedChampionshipInDb.getId());
+        assertEquals(resultDtoChampionshipUpdated.name(),expectedUpdatedChampionshipInDb.getName());
+        assertEquals(resultDtoChampionshipUpdated.startDate(),expectedUpdatedChampionshipInDb.getStartDate());
+        assertEquals(resultDtoChampionshipUpdated.city(),expectedUpdatedChampionshipInDb.getCity());
+        assertEquals(resultDtoChampionshipUpdated.numberOfTeams(),expectedUpdatedChampionshipInDb.getNumberOfTeams());
+
+        verify(championshipRepository,times(1)).findById(idOfChampionshipToFind);
+        verify(teamRepository,times(1)).findById(idOfTeamToFind);
+        verify(teamRepository,times(1)).save(team1);
+        verify(championshipRepository,times(1)).save(existingChampionshipInDb);
+
 
 
     }
