@@ -2,6 +2,7 @@ package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
+import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertTeamDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpdateDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamDto;
 import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
@@ -80,14 +81,14 @@ public class ChampionshipService {
     }
 
     @Transactional
-    public ChampionshipDto insertTeamInChampionship (Long idChampionship, Long idTeam){
+    public ChampionshipDto insertTeamInChampionship (Long idChampionship, ChampionshipInsertTeamDto championshipInsertTeamDto){
         Championship championshipDbToInsertTeam = championshipRepository
                 .findById(idChampionship)
                 .orElseThrow(()->new ResourceNotFoundException("Championship","ID",idChampionship));
 
         Team teamToInsertInChampionship = teamRepository
-                .findById(idTeam)
-                .orElseThrow(()-> new ResourceNotFoundException("Team","ID",idTeam));
+                .findById(championshipInsertTeamDto.id())
+                .orElseThrow(()-> new ResourceNotFoundException("Team","ID",championshipDbToInsertTeam.getId()));
 
         championshipDbToInsertTeam.getTeams().add(teamToInsertInChampionship);
 

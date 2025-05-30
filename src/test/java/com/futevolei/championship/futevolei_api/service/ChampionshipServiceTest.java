@@ -2,6 +2,7 @@ package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
+import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertTeamDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpdateDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Player;
@@ -177,13 +178,15 @@ public class ChampionshipServiceTest {
                 .teams(List.of(team1))
                 .build();
 
+        ChampionshipInsertTeamDto championshipInsertTeamDto = new ChampionshipInsertTeamDto(team1.getId());
+
         Long idOfChampionshipToFind = existingChampionshipInDb.getId();
         Long idOfTeamToFind = team1.getId();
 
         when(championshipRepository.findById(idOfChampionshipToFind)).thenReturn(Optional.of(existingChampionshipInDb));
         when(teamRepository.findById(idOfTeamToFind)).thenReturn(Optional.of(team1));
 
-        ChampionshipDto resultDtoChampionshipUpdated = championshipService.insertTeamInChampionship(idOfChampionshipToFind,idOfTeamToFind);
+        ChampionshipDto resultDtoChampionshipUpdated = championshipService.insertTeamInChampionship(idOfChampionshipToFind,championshipInsertTeamDto);
 
         assertNotNull(resultDtoChampionshipUpdated);
         assertEquals(resultDtoChampionshipUpdated.id(),expectedUpdatedChampionshipInDb.getId());

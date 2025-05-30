@@ -2,6 +2,7 @@ package com.futevolei.championship.futevolei_api.controller;
 
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
+import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertTeamDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpdateDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.service.ChampionshipService;
@@ -81,4 +82,21 @@ public class ChampionshipController {
         ChampionshipDto updatedDto = championshipService.partialUpdateChampionship(id, updateDto);
         return ResponseEntity.ok().body(updatedDto);
     }
+
+    @Operation(summary = "Insert an specific Team by ID in an specific Championship by ID",
+            description = "Endpoint to Insert an specific Team by ID in an specific Championship by ID")
+    @ApiResponse(responseCode = "200", description = "Success: team inserted",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ChampionshipDto.class)))
+    @ApiResponse(responseCode = "404", description = "Error: Championship not found with the provided ID")
+    @ApiResponse(responseCode = "404", description = "Error: Team not found with the provided ID")
+    @PostMapping("/{championshipId}/teams")
+    public ResponseEntity<ChampionshipDto> insertTeamInChampionship (@PathVariable Long championshipId, @RequestBody ChampionshipInsertTeamDto teamIdDtoToInsert){
+        ChampionshipDto result = championshipService.insertTeamInChampionship(championshipId,teamIdDtoToInsert);
+        return ResponseEntity.ok().body(result);
+    }
+
+
+
+
 }
