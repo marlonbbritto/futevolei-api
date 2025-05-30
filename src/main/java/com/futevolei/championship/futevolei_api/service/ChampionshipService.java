@@ -5,6 +5,7 @@ import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipIns
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertTeamDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpdateDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamDto;
+import com.futevolei.championship.futevolei_api.exception.BusinessException;
 import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Team;
@@ -88,7 +89,11 @@ public class ChampionshipService {
 
         Team teamToInsertInChampionship = teamRepository
                 .findById(championshipInsertTeamDto.id())
-                .orElseThrow(()-> new ResourceNotFoundException("Team","ID",championshipDbToInsertTeam.getId()));
+                .orElseThrow(()-> new ResourceNotFoundException("Team","ID",championshipInsertTeamDto.id()));
+
+        if(championshipDbToInsertTeam.getTeams().contains(teamToInsertInChampionship)){
+            throw new BusinessException("O time: "+teamToInsertInChampionship.getName()+ "já esta no campeonato");
+        }
 
         championshipDbToInsertTeam.getTeams().add(teamToInsertInChampionship);
 

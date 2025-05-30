@@ -15,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode(of = "id")
 public class Team implements Serializable {
 
     private static final long serialVersionUID = 1L;
