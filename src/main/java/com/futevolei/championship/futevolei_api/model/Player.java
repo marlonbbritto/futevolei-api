@@ -14,6 +14,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode(of = "id")
 public class Player implements Serializable {
 
     private static final long serialVersionUID = 1L;
