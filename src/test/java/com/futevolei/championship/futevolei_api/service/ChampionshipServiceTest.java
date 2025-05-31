@@ -259,6 +259,9 @@ public class ChampionshipServiceTest {
         assertEquals(resultDtoChampionshipUpdated.city(),expectedUpdatedChampionshipInDb.getCity());
         assertEquals(resultDtoChampionshipUpdated.numberOfTeams(),expectedUpdatedChampionshipInDb.getNumberOfTeams());
 
+        assertNull(player1.getTeam());
+        assertNull(player2.getTeam());
+
         verify(championshipRepository,times(1)).findById(idOfChampionshipToFind);
         verify(teamRepository,times(1)).findById(idOfTeamToFind);
         verify(championshipRepository,times(1)).save(existingChampionshipInDb);

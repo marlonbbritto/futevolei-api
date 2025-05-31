@@ -7,6 +7,7 @@ import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpd
 import com.futevolei.championship.futevolei_api.exception.BusinessException;
 import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Championship;
+import com.futevolei.championship.futevolei_api.model.Player;
 import com.futevolei.championship.futevolei_api.model.Team;
 import com.futevolei.championship.futevolei_api.repository.ChampionshipRepository;
 import com.futevolei.championship.futevolei_api.repository.TeamRepository;
@@ -114,6 +115,10 @@ public class ChampionshipService {
         championshipDbToRemove.getTeams().remove(teamDbToRemove);
 
         updateNumberOfTeamsInChampionship(championshipDbToRemove);
+
+        for(Player p:teamDbToRemove.getPlayers()){
+            p.setTeam(null);
+        }
 
         championshipRepository.save(championshipDbToRemove);
 
