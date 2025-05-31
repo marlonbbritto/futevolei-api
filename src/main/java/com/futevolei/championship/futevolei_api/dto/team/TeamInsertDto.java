@@ -13,8 +13,7 @@ import java.util.List;
 public record TeamInsertDto(
         @NotBlank(message = "O nome do time é obrigatório.")
         @Size(min = 3, max = 100, message = "O nome do time deve ter entre 3 e 100 caracteres.")
-        String name,
-        @NotNull
-        Long championshipId
+        String name
+
 ) {
 }

@@ -45,11 +45,8 @@ public class TeamService {
     }
 
     public TeamDto insert(TeamInsertDto teamInsertDto){
-        Championship championship = championshipRepository.findById(teamInsertDto.championshipId())
-                .orElseThrow(()-> new ResourceNotFoundException("Championship", "ID",teamInsertDto.championshipId()));
         Team newTeam = Team.builder()
                 .name(teamInsertDto.name())
-                .championship(championship)
                 .build();
         Team savedTeam = teamRepository.save(newTeam);
         return convertEntityToDto(savedTeam);

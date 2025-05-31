@@ -146,41 +146,26 @@ public class TeamServiceTest {
     @Test
     @DisplayName("Should inser a new team when everything is ok")
     void insert_ReturnNewTeamDTO(){
-        Championship championship = Championship.builder()
-                .id(1L)
-                .name("Campeonato 1")
-                .numberOfTeams(10)
-                .startDate(LocalDate.of(2025,11,11))
-                .city("Maringá")
-                .build();
-
         TeamInsertDto insertDto = new TeamInsertDto(
-                "O melhor time",
-                1L
+                "O melhor time"
         );
 
         Team team = Team.builder()
                 .id(1L)
                 .name("O melhor time")
-                .championship(championship)
                 .build();
 
-        when(championshipRepository.findById(1L)).thenReturn(Optional.of(championship));
         when(teamRepository.save(any(Team.class))).thenReturn(team);
 
         TeamDto result = teamService.insert(insertDto);
 
         assertNotNull(result);
+        assertNull(result.championship());
         assertEquals(result.id(),team.getId());
         assertEquals(result.players().size(),team.getPlayers().size());
         assertEquals(result.name(),team.getName());
-        assertEquals(result.championship().id(),team.getChampionship().getId());
-        assertEquals(result.championship().name(),team.getChampionship().getName());
-        assertEquals(result.championship().numberOfTeams(),team.getChampionship().getNumberOfTeams());
-        assertEquals(result.championship().city(),team.getChampionship().getCity());
-        assertEquals(result.championship().startDate(),team.getChampionship().getStartDate());
 
-        verify(championshipRepository,times(1)).findById(insertDto.championshipId());
+
         verify(teamRepository, times(1)).save(any(Team.class));
 
     }
