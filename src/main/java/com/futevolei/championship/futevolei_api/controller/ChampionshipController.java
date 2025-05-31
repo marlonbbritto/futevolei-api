@@ -2,7 +2,7 @@ package com.futevolei.championship.futevolei_api.controller;
 
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
-import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertTeamDto;
+import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipIdTeamDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpdateDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.service.ChampionshipService;
@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -91,7 +90,7 @@ public class ChampionshipController {
     @ApiResponse(responseCode = "404", description = "Error: Championship not found with the provided ID")
     @ApiResponse(responseCode = "404", description = "Error: Team not found with the provided ID")
     @PostMapping("/{championshipId}/teams")
-    public ResponseEntity<ChampionshipDto> insertTeamInChampionship (@PathVariable Long championshipId, @RequestBody ChampionshipInsertTeamDto teamIdDtoToInsert){
+    public ResponseEntity<ChampionshipDto> insertTeamInChampionship (@PathVariable Long championshipId, @RequestBody ChampionshipIdTeamDto teamIdDtoToInsert){
         ChampionshipDto result = championshipService.insertTeamInChampionship(championshipId,teamIdDtoToInsert);
         return ResponseEntity.ok().body(result);
     }

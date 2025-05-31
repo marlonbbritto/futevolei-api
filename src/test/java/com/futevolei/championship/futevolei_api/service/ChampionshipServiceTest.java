@@ -2,8 +2,7 @@ package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
-import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertTeamDto;
-import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpdateDto;
+import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipIdTeamDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Player;
 import com.futevolei.championship.futevolei_api.model.Team;
@@ -17,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -178,7 +178,7 @@ public class ChampionshipServiceTest {
                 .teams(List.of(team1))
                 .build();
 
-        ChampionshipInsertTeamDto championshipInsertTeamDto = new ChampionshipInsertTeamDto(team1.getId());
+        ChampionshipIdTeamDto championshipIdTeamDto = new ChampionshipIdTeamDto(team1.getId());
 
         Long idOfChampionshipToFind = existingChampionshipInDb.getId();
         Long idOfTeamToFind = team1.getId();
@@ -186,7 +186,7 @@ public class ChampionshipServiceTest {
         when(championshipRepository.findById(idOfChampionshipToFind)).thenReturn(Optional.of(existingChampionshipInDb));
         when(teamRepository.findById(idOfTeamToFind)).thenReturn(Optional.of(team1));
 
-        ChampionshipDto resultDtoChampionshipUpdated = championshipService.insertTeamInChampionship(idOfChampionshipToFind,championshipInsertTeamDto);
+        ChampionshipDto resultDtoChampionshipUpdated = championshipService.insertTeamInChampionship(idOfChampionshipToFind, championshipIdTeamDto);
 
         assertNotNull(resultDtoChampionshipUpdated);
         assertEquals(resultDtoChampionshipUpdated.id(),expectedUpdatedChampionshipInDb.getId());
@@ -202,6 +202,66 @@ public class ChampionshipServiceTest {
 
 
 
+    }
+
+    @Test
+    @DisplayName("Should remove an specific Team in an specific Championship when IDs exists and everything is correct")
+    void removeTeamInChampionship_ReturnUpdatedChampionshipDto_withNumberOfTeamsUpdated(){
+
+        Player player1 = Player.builder()
+                .id(1L)
+                .name("João Silva")
+                .build();
+
+        Player player2 = Player.builder()
+                .id(2L)
+                .name("Carlos Souza")
+                .build();
+
+        Team existingTeam1 = Team.builder()
+                .id(1L)
+                .name("Time 1")
+                .players(List.of(player1,player2))
+                .build();
+
+        Championship existingChampionshipInDb = Championship.builder()
+                .id(100L)
+                .name("Championship Test")
+                .city("Maringá")
+                .teams(new ArrayList<>(List.of(existingTeam1)))
+                .numberOfTeams(1)
+                .startDate(LocalDate.of(2025,11,11))
+                .build();
+
+        Championship expectedUpdatedChampionshipInDb = Championship.builder()
+                .id(100L)
+                .name("Championship Test")
+                .city("Maringá")
+                .startDate(LocalDate.of(2025,11,11))
+                .numberOfTeams(0)
+                .teams(List.of())
+                .build();
+
+        ChampionshipIdTeamDto championshipIdTeamDto = new ChampionshipIdTeamDto(existingTeam1.getId());
+
+        Long idOfChampionshipToFind = existingChampionshipInDb.getId();
+        Long idOfTeamToFind = existingTeam1.getId();
+
+        when(championshipRepository.findById(idOfChampionshipToFind)).thenReturn(Optional.of(existingChampionshipInDb));
+        when(teamRepository.findById(idOfTeamToFind)).thenReturn(Optional.of(existingTeam1));
+
+        ChampionshipDto resultDtoChampionshipUpdated = championshipService.removeTeamInChampionship(idOfChampionshipToFind, championshipIdTeamDto);
+
+        assertNotNull(resultDtoChampionshipUpdated);
+        assertEquals(expectedUpdatedChampionshipInDb.getId(),resultDtoChampionshipUpdated.id());
+        assertEquals(resultDtoChampionshipUpdated.name(),expectedUpdatedChampionshipInDb.getName());
+        assertEquals(resultDtoChampionshipUpdated.startDate(),expectedUpdatedChampionshipInDb.getStartDate());
+        assertEquals(resultDtoChampionshipUpdated.city(),expectedUpdatedChampionshipInDb.getCity());
+        assertEquals(resultDtoChampionshipUpdated.numberOfTeams(),expectedUpdatedChampionshipInDb.getNumberOfTeams());
+
+        verify(championshipRepository,times(1)).findById(idOfChampionshipToFind);
+        verify(teamRepository,times(1)).findById(idOfTeamToFind);
+        verify(championshipRepository,times(1)).save(existingChampionshipInDb);
     }
 
 
