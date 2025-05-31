@@ -77,9 +77,6 @@ public class PlayerService {
             if(playerUpdateDto.registrations()!=null){
                 existingPlayer.setRegistrations(playerUpdateDto.registrations());
             }
-            if(playerUpdateDto.team()!=null){
-                existingPlayer.setTeam(playerUpdateDto.team());
-            }
             Player updatedPlayer = playerRepository.save(existingPlayer);
             return convertEntityToDto(updatedPlayer);
         }).orElseThrow(()->new ResourceNotFoundException("Player","ID",id));

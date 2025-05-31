@@ -161,7 +161,7 @@ public class PlayerServiceTest {
 
         PlayerUpdateDto updatedDto = new PlayerUpdateDto(
                 "Juliana Cardoso Britto",
-                null,
+
                 Registrations.PAID
         );
 
