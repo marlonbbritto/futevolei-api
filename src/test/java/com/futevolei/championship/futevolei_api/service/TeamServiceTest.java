@@ -210,14 +210,6 @@ public class TeamServiceTest {
                 .city("Maringá")
                 .build();
 
-        Championship championshipForUpdate = Championship.builder()
-                .id(2L)
-                .name("Campeonato 2")
-                .numberOfTeams(12)
-                .startDate(LocalDate.of(2025,10,10))
-                .city("Londrina")
-                .build();
-
         Team teamFromRepository = Team.builder()
                 .id(1L)
                 .name("O time para atualizar")
@@ -227,18 +219,16 @@ public class TeamServiceTest {
         Long teamIdToUpdate = teamFromRepository.getId();
 
         TeamUpdateDto inputDto = new TeamUpdateDto(
-                "O time ATUALIZADO",
-                2L
+                "O time ATUALIZADO"
         );
 
         Team expectedTeamStateAfterSave = Team.builder()
                 .id(teamIdToUpdate)
                 .name(inputDto.name())
-                .championship(championshipForUpdate)
+                .championship(championshipInitial)
                 .build();
 
         when(teamRepository.findById(teamIdToUpdate)).thenReturn(Optional.of(teamFromRepository));
-        when(championshipRepository.findById(2L)).thenReturn(Optional.of(championshipForUpdate));
         when(teamRepository.save(any(Team.class))).thenReturn(expectedTeamStateAfterSave);
 
         TeamDto resultDto = teamService.updateTeam(teamIdToUpdate, inputDto);
@@ -255,7 +245,7 @@ public class TeamServiceTest {
 
 
         verify(teamRepository,times(1)).findById(teamIdToUpdate);
-        verify(championshipRepository,times(1)).findById(inputDto.championshipId());
+
 
     }
 }

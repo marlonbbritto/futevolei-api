@@ -66,13 +66,6 @@ public class TeamService {
         if (teamUpdateDto.name()!=null && !teamUpdateDto.name().isBlank()){
             teamToUpdate.setName(teamUpdateDto.name());
         }
-        if (teamUpdateDto.championshipId()!=null){
-            Championship championship = championshipRepository.findById(teamUpdateDto.championshipId())
-                    .orElseThrow(()->new ResourceNotFoundException("Championship","ID",teamUpdateDto.championshipId()));
-            teamToUpdate.setChampionship(championship);
-        }else {
-            teamToUpdate.setChampionship(null);
-        }
         teamRepository.save(teamToUpdate);
         return convertEntityToDto(teamToUpdate);
     }
