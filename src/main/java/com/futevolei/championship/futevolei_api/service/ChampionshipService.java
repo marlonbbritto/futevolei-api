@@ -104,12 +104,12 @@ public class ChampionshipService {
     }
 
     @Transactional
-    public ChampionshipDto removeTeamInChampionship(Long idChampionship, ChampionshipIdTeamDto championshipIdTeamDto){
+    public ChampionshipDto removeTeamInChampionship(Long idChampionship, Long idTeam){
         Championship championshipDbToRemove = championshipRepository.findById(idChampionship)
                 .orElseThrow(()->new ResourceNotFoundException("Championship", "ID",idChampionship));
 
-        Team teamDbToRemove = teamRepository.findById(championshipIdTeamDto.id())
-                .orElseThrow(()->new ResourceNotFoundException("Team","ID", championshipIdTeamDto.id()));
+        Team teamDbToRemove = teamRepository.findById(idTeam)
+                .orElseThrow(()->new ResourceNotFoundException("Team","ID", idTeam));
 
         championshipDbToRemove.getTeams().remove(teamDbToRemove);
 

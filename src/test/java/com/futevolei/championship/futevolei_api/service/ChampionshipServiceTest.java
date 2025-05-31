@@ -250,7 +250,7 @@ public class ChampionshipServiceTest {
         when(championshipRepository.findById(idOfChampionshipToFind)).thenReturn(Optional.of(existingChampionshipInDb));
         when(teamRepository.findById(idOfTeamToFind)).thenReturn(Optional.of(existingTeam1));
 
-        ChampionshipDto resultDtoChampionshipUpdated = championshipService.removeTeamInChampionship(idOfChampionshipToFind, championshipIdTeamDto);
+        ChampionshipDto resultDtoChampionshipUpdated = championshipService.removeTeamInChampionship(idOfChampionshipToFind, idOfTeamToFind);
 
         assertNotNull(resultDtoChampionshipUpdated);
         assertEquals(expectedUpdatedChampionshipInDb.getId(),resultDtoChampionshipUpdated.id());

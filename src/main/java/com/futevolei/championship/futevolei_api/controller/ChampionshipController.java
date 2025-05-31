@@ -95,6 +95,19 @@ public class ChampionshipController {
         return ResponseEntity.ok().body(result);
     }
 
+    @Operation(summary = "remove an specific Team by ID in an specific Championship by ID",
+            description = "Endpoint to remove an specific Team by ID in an specific Championship by ID")
+    @ApiResponse(responseCode = "200", description = "Success: team removed",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = ChampionshipDto.class)))
+    @ApiResponse(responseCode = "404", description = "Error: Championship not found with the provided ID")
+    @ApiResponse(responseCode = "404", description = "Error: Team not found with the provided ID")
+    @DeleteMapping("/{championshipId}/teams/{idTeam}")
+    public ResponseEntity<ChampionshipDto> removeTeamInChampionship (@PathVariable Long championshipId, @PathVariable Long idTeam){
+        ChampionshipDto result = championshipService.removeTeamInChampionship(championshipId,idTeam);
+        return ResponseEntity.ok().body(result);
+    }
+
 
 
 
