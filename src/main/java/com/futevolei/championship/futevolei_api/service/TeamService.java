@@ -2,13 +2,17 @@ package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerSummaryDto;
+import com.futevolei.championship.futevolei_api.dto.team.TeamAddPlayerIdDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamInsertDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamUpdateDto;
+import com.futevolei.championship.futevolei_api.exception.BusinessException;
 import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Championship;
+import com.futevolei.championship.futevolei_api.model.Player;
 import com.futevolei.championship.futevolei_api.model.Team;
 import com.futevolei.championship.futevolei_api.repository.ChampionshipRepository;
+import com.futevolei.championship.futevolei_api.repository.PlayerRepository;
 import com.futevolei.championship.futevolei_api.repository.TeamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +33,9 @@ public class TeamService {
     private ChampionshipRepository championshipRepository;
 
     @Autowired
+    private PlayerRepository playerRepository;
+
+    @Autowired
     private ChampionshipService championshipService;
 
     public List<TeamDto> findAll(){
@@ -47,6 +54,7 @@ public class TeamService {
                 .orElseThrow(()->new ResourceNotFoundException("Team", "ID",id));
     }
 
+    @Transactional
     public TeamDto insert(TeamInsertDto teamInsertDto){
         Team newTeam = Team.builder()
                 .name(teamInsertDto.name())
@@ -56,6 +64,7 @@ public class TeamService {
 
     }
 
+    @Transactional
     public void delete(Long id){
         Team teamToDelete = teamRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Team", "ID",id));
@@ -77,6 +86,31 @@ public class TeamService {
         }
         teamRepository.save(teamToUpdate);
         return convertEntityToDto(teamToUpdate);
+    }
+
+    @Transactional
+    public TeamDto addPlayer(Long idTeam, Long idPlayer){
+        Player playerInDb = playerRepository.findById(idPlayer)
+                .orElseThrow(()->new ResourceNotFoundException("Player","ID",idPlayer));
+        if (playerInDb.getTeam()!=null){
+            throw new BusinessException("O jogador "+playerInDb.getName()+" ja esta atribuido ao time "+playerInDb.getTeam().getName());
+        }
+
+        Team teamInDb = teamRepository.findById(idTeam)
+                .orElseThrow(()-> new ResourceNotFoundException("Team","ID",idTeam));
+
+        if(teamInDb.getPlayers().size()>=2){
+            throw  new BusinessException("Esse time ja tem dois jogadores inclusos, logo não pode ser incluido um novo jogador");
+        }
+
+        teamInDb.getPlayers().add(playerInDb);
+        playerInDb.setTeam(teamInDb);
+
+        teamRepository.save(teamInDb);
+        playerRepository.save(playerInDb);
+
+        return convertEntityToDto(teamInDb);
+
     }
 
     public TeamDto convertEntityToDto(Team team){

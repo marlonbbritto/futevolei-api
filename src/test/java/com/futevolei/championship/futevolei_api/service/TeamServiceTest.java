@@ -6,7 +6,9 @@ import com.futevolei.championship.futevolei_api.dto.team.TeamUpdateDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Player;
 import com.futevolei.championship.futevolei_api.model.Team;
+import com.futevolei.championship.futevolei_api.model.enums.Registrations;
 import com.futevolei.championship.futevolei_api.repository.ChampionshipRepository;
+import com.futevolei.championship.futevolei_api.repository.PlayerRepository;
 import com.futevolei.championship.futevolei_api.repository.TeamRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,6 +42,9 @@ public class TeamServiceTest {
 
     @MockitoBean
     private ChampionshipRepository championshipRepository;
+
+    @MockitoBean
+    private PlayerRepository playerRepository;
 
     @Test
     @DisplayName("Should bring all registered teams when everything is correct")
@@ -215,7 +220,7 @@ public class TeamServiceTest {
         Long idChampionship = championship.getId();
 
         when(teamRepository.findById(idToDelete)).thenReturn(Optional.of(teamToDelete));
-        doNothing().when(championshipService).removeTeamInChampionship(idChampionship, idToDelete);
+        when(championshipService.removeTeamInChampionship(idChampionship, idToDelete)).thenReturn(null);
 
         assertDoesNotThrow(()->teamService.delete(idToDelete));
 
@@ -271,6 +276,52 @@ public class TeamServiceTest {
 
 
         verify(teamRepository,times(1)).findById(teamIdToUpdate);
+
+
+    }
+
+    @Test
+    @DisplayName("add an specific Player in an specific Team when everything is ok")
+    void addPlayer_ReturnTeamDtoWhenCanDoAddPlayerAnSpecificTeam (){
+        Team teamInDbToInsertPlayer = Team.builder()
+                .id(1L)
+                .name("Time para incluir jogador")
+                .build();
+        Player playerInDb = Player.builder()
+                .id(1L)
+                .name("Joaozinho")
+                .registrations(Registrations.TO_PAY)
+                .build();
+        Long playerIdToInsert = playerInDb.getId();
+        Long teamIDToInsertPlayer = teamInDbToInsertPlayer.getId();
+
+        Team teamInDbUpdated = Team.builder()
+                .id(1L)
+                .name("Time para incluir jogador")
+                .players(new ArrayList<>(List.of(playerInDb)))
+                .build();
+
+        when(playerRepository.findById(playerIdToInsert)).thenReturn(Optional.of(playerInDb));
+        when(teamRepository.findById(teamIDToInsertPlayer)).thenReturn(Optional.of(teamInDbToInsertPlayer));
+
+        when(playerRepository.save(any(Player.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(teamRepository.save(any(Team.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        TeamDto resultDto = teamService.addPlayer(teamIDToInsertPlayer,playerIdToInsert);
+
+        assertNotNull(resultDto);
+
+        assertEquals(teamInDbUpdated.getId(),resultDto.id());
+        assertEquals(teamInDbUpdated.getPlayers().size(),resultDto.players().size());
+        assertEquals(teamInDbUpdated.getName(),resultDto.name());
+        assertEquals(teamInDbUpdated.getPlayers().get(0).getId(),resultDto.players().get(0).id());
+        assertEquals(teamInDbUpdated.getPlayers().get(0).getName(),resultDto.players().get(0).name());
+        assertEquals(teamInDbUpdated.getPlayers().get(0).getRegistrations(),resultDto.players().get(0).registrations());
+
+        verify(playerRepository,times(1)).findById(playerIdToInsert);
+        verify(teamRepository,times(1)).findById(teamIDToInsertPlayer);
+        verify(playerRepository,times(1)).save(playerInDb);
+        verify(teamRepository,times(1)).save(teamInDbUpdated);
 
 
     }

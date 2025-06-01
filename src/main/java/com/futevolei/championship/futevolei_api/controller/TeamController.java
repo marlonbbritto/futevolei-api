@@ -1,6 +1,7 @@
 package com.futevolei.championship.futevolei_api.controller;
 
 import com.futevolei.championship.futevolei_api.dto.player.PlayerDto;
+import com.futevolei.championship.futevolei_api.dto.team.TeamAddPlayerIdDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamUpdateDto;
 import com.futevolei.championship.futevolei_api.service.TeamService;
@@ -62,7 +63,7 @@ public class TeamController {
     @Operation(summary = "Delete an specific team",
             description = "Endpoint to delete an specific team registered based on its ID")
 
-    @ApiResponse(responseCode = "No Content",
+    @ApiResponse(responseCode = "204",
             description = "Success: team deleted",
             content = @Content(mediaType = "application/json"))
 
@@ -70,6 +71,20 @@ public class TeamController {
     public ResponseEntity<Void> deleteTeam(@PathVariable Long id){
         teamService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "insert an Player in a specific team",
+            description = "Endpoint to insert an Player an specific team registered based on its ID")
+
+    @ApiResponse(responseCode = "200",
+            description = "Success: Player add the team",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = TeamDto.class)))
+
+    @PostMapping(value = "/{id}/players")
+    public ResponseEntity<TeamDto> addPlayerInAnTeam(@PathVariable Long id,@Valid @RequestBody TeamAddPlayerIdDto idPlayer){
+        TeamDto resultDto = teamService.addPlayer(id, idPlayer.id());
+        return ResponseEntity.ok().body(resultDto);
     }
 
 
