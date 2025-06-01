@@ -28,6 +28,9 @@ public class TeamService {
     @Autowired
     private ChampionshipRepository championshipRepository;
 
+    @Autowired
+    private ChampionshipService championshipService;
+
     public List<TeamDto> findAll(){
         List<Team> teamsList = teamRepository.findAll();
         return teamsList
@@ -56,7 +59,13 @@ public class TeamService {
     public void delete(Long id){
         Team teamToDelete = teamRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Team", "ID",id));
-        teamRepository.delete(teamToDelete);
+        if(teamToDelete.getChampionship()==null){
+            teamRepository.delete(teamToDelete);
+        }else {
+            championshipService.removeTeamInChampionship(teamToDelete.getChampionship().getId(),teamToDelete.getId());
+        }
+
+
     }
 
     @Transactional

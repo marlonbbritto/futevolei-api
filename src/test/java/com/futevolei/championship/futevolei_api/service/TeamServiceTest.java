@@ -33,6 +33,9 @@ public class TeamServiceTest {
     private TeamService teamService;
 
     @MockitoBean
+    private ChampionshipService championshipService;
+
+    @MockitoBean
     private  TeamRepository teamRepository;
 
     @MockitoBean
@@ -171,7 +174,28 @@ public class TeamServiceTest {
     }
 
     @Test
-    @DisplayName("Should delete an specific team when Id exist and everythin ok")
+    @DisplayName("Should delete an specifi team when id exist, teams has no Championship")
+    void delete_teamWithoutChampionship(){
+        Team teamToDelete = Team.builder()
+                .id(1L)
+                .name("Time Solto")
+                .championship(null)
+                .build();
+
+        Long teamIdToDelete = teamToDelete.getId();
+
+        when(teamRepository.findById(teamIdToDelete)).thenReturn(Optional.of(teamToDelete));
+        doNothing().when(teamRepository).delete(teamToDelete);
+
+        teamService.delete(teamIdToDelete);
+
+        verify(teamRepository).findById(teamIdToDelete);
+        verify(teamRepository).delete(teamToDelete);
+        verifyNoInteractions(championshipService);
+    }
+
+    @Test
+    @DisplayName("Should delete an specific team when Id exist and has Championship and everythin ok")
     void delete_VoidDeleteAnTeam(){
         Championship championship = Championship.builder()
                 .id(1L)
@@ -188,14 +212,16 @@ public class TeamServiceTest {
                 .build();
 
         Long idToDelete = teamToDelete.getId();
+        Long idChampionship = championship.getId();
 
         when(teamRepository.findById(idToDelete)).thenReturn(Optional.of(teamToDelete));
-        doNothing().when(teamRepository).delete(teamToDelete);
+        doNothing().when(championshipService).removeTeamInChampionship(idChampionship, idToDelete);
 
         assertDoesNotThrow(()->teamService.delete(idToDelete));
 
-        verify(teamRepository,times(1)).findById(idToDelete);
-        verify(teamRepository,times(1)).delete(teamToDelete);
+        verify(teamRepository).findById(idToDelete);
+        verify(championshipService).removeTeamInChampionship(idChampionship, idToDelete);
+        verify(teamRepository, never()).delete(teamToDelete);
 
 
     }

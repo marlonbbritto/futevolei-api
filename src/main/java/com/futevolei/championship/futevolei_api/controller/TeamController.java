@@ -49,7 +49,7 @@ public class TeamController {
             description = "Endpoint to update an of a specific team registered based on its ID")
 
     @ApiResponse(responseCode = "200",
-            description = "Success: team found",
+            description = "Success: team updated",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = TeamDto.class)))
 
@@ -57,6 +57,19 @@ public class TeamController {
     public ResponseEntity<TeamDto> partialUpdateTeam(@PathVariable Long id,@Valid @RequestBody TeamUpdateDto teamUpdateDto){
         TeamDto resultDto = teamService.updateTeam(id, teamUpdateDto);
         return ResponseEntity.ok().body(resultDto);
+    }
+
+    @Operation(summary = "Delete an specific team",
+            description = "Endpoint to delete an specific team registered based on its ID")
+
+    @ApiResponse(responseCode = "No Content",
+            description = "Success: team deleted",
+            content = @Content(mediaType = "application/json"))
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteTeam(@PathVariable Long id){
+        teamService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 
