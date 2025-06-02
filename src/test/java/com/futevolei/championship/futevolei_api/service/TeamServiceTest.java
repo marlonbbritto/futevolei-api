@@ -104,7 +104,7 @@ public class TeamServiceTest {
     }
 
     @Test
-    @DisplayName("Should bring an specifi Team when ID exist and everything is ok")
+    @DisplayName("Should bring an specific Team when ID exist and everything is ok")
     void findById_ReturnSpecifTeamDto(){
         Player player1 = Player.builder()
                 .id(2L)
@@ -200,7 +200,7 @@ public class TeamServiceTest {
     }
 
     @Test
-    @DisplayName("Should delete an specific team when Id exist and has Championship and everythin ok")
+    @DisplayName("Should delete an specific team when Id exist and has Championship and everything ok")
     void delete_VoidDeleteAnTeam(){
         Championship championship = Championship.builder()
                 .id(1L)
@@ -227,9 +227,8 @@ public class TeamServiceTest {
         verify(teamRepository).findById(idToDelete);
         verify(championshipService).removeTeamInChampionship(idChampionship, idToDelete);
         verify(teamRepository, never()).delete(teamToDelete);
-
-
     }
+
     @Test
     @DisplayName("Should update a Team when informations was send and everything is correct")
     void updateTeam_ReturnTeamUpdatedDtoWhenEverythingCorrect(){
@@ -324,5 +323,46 @@ public class TeamServiceTest {
         verify(teamRepository,times(1)).save(teamInDbUpdated);
 
 
+    }
+
+    @Test
+    @DisplayName("remove an specific Player in an specific Team when everything is ok")
+    void removePlayer_ReturnNoContentWhenCanDoRemovePlayerAnSpecificTeam (){
+
+        Player playerToBeRemoved = Player.builder()
+                .id(1L)
+                .name("Joaozinho")
+                .registrations(Registrations.TO_PAY)
+                .build();
+
+        Team teamContainingPlayer = Team.builder()
+                .id(1L)
+                .name("Time para incluir jogador")
+                .build();
+
+        teamContainingPlayer.getPlayers().add(playerToBeRemoved);
+        playerToBeRemoved.setTeam(teamContainingPlayer);
+
+        Long idTeamToFind = teamContainingPlayer.getId();
+        Long idPlayerToFind = playerToBeRemoved.getId();
+
+        when(teamRepository.findById(idTeamToFind)).thenReturn(Optional.of(teamContainingPlayer));
+        when(playerRepository.findById(idPlayerToFind)).thenReturn(Optional.of(playerToBeRemoved));
+
+        when(teamRepository.save(any(Team.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(playerRepository.save(any(Player.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+
+
+        assertDoesNotThrow(()->teamService.removePlayer(idTeamToFind,idPlayerToFind));
+
+        assertTrue(teamContainingPlayer.getPlayers().isEmpty());
+        assertNull(playerToBeRemoved.getTeam());
+
+        verify(teamRepository,times(1)).findById(idTeamToFind);
+        verify(playerRepository,times(1)).findById(idPlayerToFind);
+
+        verify(teamRepository,times(1)).save(teamContainingPlayer);
+        verify(playerRepository,times(1)).save(playerToBeRemoved);
     }
 }

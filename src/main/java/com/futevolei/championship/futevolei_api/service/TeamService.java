@@ -113,6 +113,25 @@ public class TeamService {
 
     }
 
+    @Transactional
+    public void removePlayer(Long idTeam, Long idPlayer){
+        Team teamToRemovePlayer = teamRepository.findById(idTeam)
+                .orElseThrow(()->new ResourceNotFoundException("Team","ID",idTeam));
+
+        Player playerToRemove = playerRepository.findById(idPlayer)
+                .orElseThrow(()->new ResourceNotFoundException("Player","ID",idPlayer));
+
+        if (!teamToRemovePlayer.getPlayers().contains(playerToRemove)){
+            throw new BusinessException("O jogador "+ playerToRemove.getName() + " não pertence a este time");
+        }
+
+        teamToRemovePlayer.getPlayers().remove(playerToRemove);
+        playerToRemove.setTeam(null);
+
+        teamRepository.save(teamToRemovePlayer);
+        playerRepository.save(playerToRemove);
+    }
+
     public TeamDto convertEntityToDto(Team team){
         List<PlayerSummaryDto> playerSummaryDtosList = team.getPlayers()
                 .stream()

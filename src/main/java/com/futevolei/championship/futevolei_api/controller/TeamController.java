@@ -87,5 +87,18 @@ public class TeamController {
         return ResponseEntity.ok().body(resultDto);
     }
 
+    @Operation(summary = "remove an Player in a specific team",
+            description = "Endpoint to remove an Player an specific team registered based on its ID")
+
+    @ApiResponse(responseCode = "204",
+            description = "Success: Player remove the team",
+            content = @Content(mediaType = "application/json"))
+
+    @DeleteMapping(value = "/{id}/players/{idPlayer}")
+    public ResponseEntity<TeamDto> removePlayerInAnTeam(@PathVariable Long id,@PathVariable Long idPlayer){
+        teamService.removePlayer(id, idPlayer);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
