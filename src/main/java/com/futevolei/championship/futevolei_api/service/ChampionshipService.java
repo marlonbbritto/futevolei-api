@@ -4,6 +4,7 @@ import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipInsertDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipIdTeamDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipUpdateDto;
+import com.futevolei.championship.futevolei_api.dto.team.TeamSummaryDto;
 import com.futevolei.championship.futevolei_api.exception.BusinessException;
 import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Championship;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -141,12 +143,19 @@ public class ChampionshipService {
     }
 
     private ChampionshipDto convertEntityToDto(Championship championship){
+        List<TeamSummaryDto> summaryListOfTeams = new ArrayList<>();
+        if (championship.getTeams() != null) {
+            summaryListOfTeams = championship.getTeams().stream()
+                    .map(team -> new TeamSummaryDto(team.getId(), team.getName()))
+                    .collect(Collectors.toList());
+        }
         return new ChampionshipDto(
                 championship.getId(),
                 championship.getName(),
                 championship.getStartDate(),
                 championship.getCity(),
-                championship.getNumberOfTeams()
+                championship.getNumberOfTeams(),
+                summaryListOfTeams
 
         );
     }

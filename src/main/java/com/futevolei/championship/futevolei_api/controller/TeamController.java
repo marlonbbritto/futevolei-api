@@ -3,6 +3,7 @@ package com.futevolei.championship.futevolei_api.controller;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamAddPlayerIdDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamDto;
+import com.futevolei.championship.futevolei_api.dto.team.TeamInsertDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamUpdateDto;
 import com.futevolei.championship.futevolei_api.service.TeamService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,8 +48,19 @@ public class TeamController {
         return ResponseEntity.ok().body(resultDto);
     }
 
-    @Operation(summary = "Update an specific team",
-            description = "Endpoint to update an of a specific team registered based on its ID")
+    @Operation(summary = "Insert an team",
+            description = "Endpoint to insert an team")
+
+    @ApiResponse(responseCode = "201",
+            description = "Success: team inserted",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = TeamDto.class)))
+
+    @PostMapping
+    public ResponseEntity<TeamDto> insertTeam (@Valid @RequestBody TeamInsertDto teamInsertDto){
+        TeamDto resultDto = teamService.insert(teamInsertDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(resultDto);
+    }
 
     @ApiResponse(responseCode = "200",
             description = "Success: team updated",

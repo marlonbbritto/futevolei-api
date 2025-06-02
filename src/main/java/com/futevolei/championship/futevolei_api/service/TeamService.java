@@ -2,10 +2,7 @@ package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipDto;
 import com.futevolei.championship.futevolei_api.dto.player.PlayerSummaryDto;
-import com.futevolei.championship.futevolei_api.dto.team.TeamAddPlayerIdDto;
-import com.futevolei.championship.futevolei_api.dto.team.TeamDto;
-import com.futevolei.championship.futevolei_api.dto.team.TeamInsertDto;
-import com.futevolei.championship.futevolei_api.dto.team.TeamUpdateDto;
+import com.futevolei.championship.futevolei_api.dto.team.*;
 import com.futevolei.championship.futevolei_api.exception.BusinessException;
 import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Championship;
@@ -19,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -145,12 +143,20 @@ public class TeamService {
         ChampionshipDto championshipDto = null;
         if (team.getChampionship() != null) {
             Championship champEntity = team.getChampionship();
+
+            List<TeamSummaryDto> summariesOfChampionship = new ArrayList<>();
+            if (champEntity.getTeams() != null) {
+                summariesOfChampionship = champEntity.getTeams().stream()
+                        .map(teamOfChampionship -> new TeamSummaryDto(teamOfChampionship.getId(), teamOfChampionship.getName()))
+                        .collect(Collectors.toList());
+            }
             championshipDto = new ChampionshipDto(
                     champEntity.getId(),
                     champEntity.getName(),
                     champEntity.getStartDate(),
                     champEntity.getCity(),
-                    champEntity.getNumberOfTeams()
+                    champEntity.getNumberOfTeams(),
+                    summariesOfChampionship
             );
         }
 
