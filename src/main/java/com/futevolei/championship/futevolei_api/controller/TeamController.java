@@ -108,7 +108,7 @@ public class TeamController {
             content = @Content(mediaType = "application/json"))
 
     @DeleteMapping(value = "/{id}/players/{idPlayer}")
-    public ResponseEntity<TeamDto> removePlayerInAnTeam(@PathVariable Long id,@PathVariable Long idPlayer){
+    public ResponseEntity<Void> removePlayerInAnTeam(@PathVariable Long id,@PathVariable Long idPlayer){
         teamService.removePlayer(id, idPlayer);
         return ResponseEntity.noContent().build();
     }
