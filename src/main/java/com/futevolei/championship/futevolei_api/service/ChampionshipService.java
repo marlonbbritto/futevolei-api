@@ -8,6 +8,7 @@ import com.futevolei.championship.futevolei_api.dto.team.TeamSummaryDto;
 import com.futevolei.championship.futevolei_api.exception.BusinessException;
 import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Championship;
+import com.futevolei.championship.futevolei_api.model.Match;
 import com.futevolei.championship.futevolei_api.model.Player;
 import com.futevolei.championship.futevolei_api.model.Team;
 import com.futevolei.championship.futevolei_api.repository.ChampionshipRepository;
@@ -127,6 +128,51 @@ public class ChampionshipService {
         return convertEntityToDto(championshipDbToRemove);
 
     }
+
+    /*private List<Match> makeMatchesForChampionship(Long idChampionship){
+        Championship championship = championshipRepository.findById(idChampionship)
+                .orElseThrow(()->new ResourceNotFoundException("Championship", "ID", idChampionship));
+
+        updateNumberOfTeamsInChampionship(championship); // guarantee of updating the number of teams in the championship
+
+        if (championship.getNumberOfTeams()<8){
+            throw new BusinessException("Campeonatos de dupla eliminatoria faz sentido quando existem 8 ou mais duplas e seu campeonato tem: " + championship.getTeams().size() + " duplas");
+        }
+
+        List<Integer> numberOfMatchesInEachPhaseOfWinnersBracket = numberOfMatchesInWinnersBracket(championship.getNumberOfTeams());
+
+
+
+
+
+
+    }*/
+
+    private List<Integer> numberOfMatchesInWinnersBracket (Integer numberOfTeamsInChampionship) {
+
+        List<Integer> numberOfMatchesInEachPhaseOfWinnersBracket = new ArrayList<>();
+
+        Double exponentPotenceMatchCalculation = Math.ceil(Math.log(numberOfTeamsInChampionship) / Math.log(2));
+
+        Integer potenceMatchCalculation = (int) Math.pow(2, exponentPotenceMatchCalculation);
+
+        Integer numberOfMatchesFirstRoundInWinnerBracket = (numberOfTeamsInChampionship * 2 - potenceMatchCalculation) / 2;
+
+        Integer numberOfMatcheSecondRoundWinnerBracket = (numberOfMatchesFirstRoundInWinnerBracket +
+                (potenceMatchCalculation - numberOfTeamsInChampionship))/2;
+
+        numberOfMatchesInEachPhaseOfWinnersBracket.add(numberOfMatchesFirstRoundInWinnerBracket);
+        numberOfMatchesInEachPhaseOfWinnersBracket.add(numberOfMatcheSecondRoundWinnerBracket);
+
+        while (numberOfMatchesInEachPhaseOfWinnersBracket.getLast() > 2) {
+            Integer numberOfMatchesNexRound = numberOfMatchesInEachPhaseOfWinnersBracket.getLast() / 2;
+            numberOfMatchesInEachPhaseOfWinnersBracket.add(numberOfMatchesNexRound);
+        }
+
+        return numberOfMatchesInEachPhaseOfWinnersBracket;
+    }
+
+
 
     private void updateNumberOfTeamsInChampionship(Championship championship){
         championship.setNumberOfTeams(championship.getTeams().size());
