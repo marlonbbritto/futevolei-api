@@ -1,6 +1,7 @@
 package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.MatchDto;
+import com.futevolei.championship.futevolei_api.dto.match.MatchUpdateDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamDto;
 import com.futevolei.championship.futevolei_api.model.Championship;
 import com.futevolei.championship.futevolei_api.model.Match;
@@ -280,6 +281,117 @@ public class MatchServiceTest {
         assertEquals(matchDb.getLoser().getId(),resultMatchDto.loser().id());
 
         verify(matchRepository,times(1)).findById(idMatchToFind);
+    }
+
+    @Test
+    @DisplayName("Should update an specific Match when everithyng is ok ")
+    void updateMatch_ReturnsMatchDtoUpdated(){
+        Championship championshipInDb = Championship.builder()
+                .id(1L)
+                .name("Campeonato Teste")
+                .city("Maringá")
+                .startDate(LocalDate.of(2025,11,11))
+                .numberOfTeams(2)
+                .build();
+
+        Player player1InDb = Player.builder()
+                .id(1L)
+                .name("Marlon Britto")
+                .registrations(Registrations.PAID)
+                .build();
+
+        Player player2InDb  = Player.builder()
+                .id(2L)
+                .name("Carlos Silva")
+                .registrations(Registrations.PAID)
+                .build();
+
+        Player player3InDb  = Player.builder()
+                .id(3L)
+                .name("Eduardo Santos")
+                .registrations(Registrations.PAID)
+                .build();
+
+        Player player4InDb  = Player.builder()
+                .id(4L)
+                .name("João Silva")
+                .registrations(Registrations.PAID)
+                .build();
+
+        Team team1InDb  = Team.builder()
+                .id(1L)
+                .name("Team 1")
+                .build();
+
+        Team team2InDb  = Team.builder()
+                .id(2L)
+                .name("Team 2")
+                .build();
+
+        team1InDb.getPlayers().addAll(List.of(player1InDb, player2InDb));
+        player1InDb.setTeam(team1InDb);
+        player2InDb.setTeam(team1InDb);
+
+        team2InDb.getPlayers().addAll(List.of(player3InDb, player4InDb));
+        player3InDb.setTeam(team2InDb);
+        player4InDb.setTeam(team2InDb);
+
+        championshipInDb.getTeams().addAll(List.of(team1InDb, team2InDb));
+
+        Match matchInDb = Match.builder()
+                .id(1L)
+                .matchStatus(MatchStatus.IN_PROGRESS)
+                .round(1)
+                .keyType(KeyType.WINNERS)
+                .championship(championshipInDb)
+                .team1(team1InDb)
+                .team2(team2InDb)
+                .scoreTeam1(null)
+                .scoreTeam2(null)
+                .build();
+
+        championshipInDb.getMatches().add(matchInDb);
+
+        Long idMatchToFind = matchInDb.getId();
+
+        MatchUpdateDto matchUpdateDto = new MatchUpdateDto(
+                MatchStatus.COMPLETED,
+                18,
+                15
+        );
+
+        when(matchRepository.findById(idMatchToFind)).thenReturn(Optional.of(matchInDb));
+        when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        MatchDto resultDto = matchService.updateMatch(idMatchToFind,matchUpdateDto);
+
+        assertNotNull(resultDto);
+
+        assertEquals(idMatchToFind, resultDto.id());
+        assertEquals(matchInDb.getRound(), resultDto.round());
+        assertEquals(matchInDb.getKeyType(), resultDto.keyType());
+        assertEquals(MatchStatus.COMPLETED, resultDto.matchStatus());
+        assertEquals(18, resultDto.scoreTeam1());
+        assertEquals(15, resultDto.scoreTeam2());
+
+        assertNotNull(resultDto.championship());
+        assertEquals(championshipInDb.getId(), resultDto.championship().id());
+
+        assertNotNull(resultDto.team1());
+        assertEquals(team1InDb.getId(), resultDto.team1().id());
+        assertNotNull(resultDto.team2());
+        assertEquals(team2InDb.getId(), resultDto.team2().id());
+
+        assertNotNull(resultDto.winner());
+        assertEquals(team1InDb.getId(), resultDto.winner().id());
+        assertNotNull(resultDto.loser());
+        assertEquals(team2InDb.getId(), resultDto.loser().id());
+
+
+        verify(matchRepository, times(1)).findById(idMatchToFind);
+
+        verify(matchRepository, times(1)).save(matchInDb);
+
     }
 
 }

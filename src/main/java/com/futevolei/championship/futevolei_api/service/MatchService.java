@@ -2,12 +2,16 @@ package com.futevolei.championship.futevolei_api.service;
 
 import com.futevolei.championship.futevolei_api.dto.MatchDto;
 import com.futevolei.championship.futevolei_api.dto.championship.ChampionshipSummaryDto;
+import com.futevolei.championship.futevolei_api.dto.match.MatchUpdateDto;
 import com.futevolei.championship.futevolei_api.dto.team.TeamSummaryDto;
+import com.futevolei.championship.futevolei_api.exception.BusinessException;
 import com.futevolei.championship.futevolei_api.exception.ResourceNotFoundException;
 import com.futevolei.championship.futevolei_api.model.Match;
+import com.futevolei.championship.futevolei_api.model.enums.MatchStatus;
 import com.futevolei.championship.futevolei_api.repository.MatchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +36,50 @@ public class MatchService {
         return match
                 .map(this::convertEntityToMatch)
                 .orElseThrow(()->new ResourceNotFoundException("Match","ID",id));
+    }
+
+    @Transactional
+    public MatchDto updateMatch(Long idMatch, MatchUpdateDto matchUpdateDto){
+        Match matchInDb = matchRepository.findById(idMatch)
+                .orElseThrow(()->new ResourceNotFoundException("Match","ID",idMatch));
+
+        if(matchUpdateDto.matchStatus()!=null){
+            matchInDb.setMatchStatus(matchUpdateDto.matchStatus());
+        }
+
+        if(matchUpdateDto.scoreTeam1()!=null){
+            matchInDb.setScoreTeam1(matchUpdateDto.scoreTeam1());
+        }
+
+        if(matchUpdateDto.scoreTeam2()!=null){
+            matchInDb.setScoreTeam2(matchUpdateDto.scoreTeam2());
+        }
+
+        if(matchInDb.getMatchStatus()== MatchStatus.COMPLETED){
+            matchInDb=defineLoserAndWinnerOfMatch(matchInDb);
+        }
+
+        matchRepository.save(matchInDb);
+
+        return convertEntityToMatch(matchInDb);
+    }
+
+    private Match defineLoserAndWinnerOfMatch (Match match){
+        if(!(match.getScoreTeam1()>=0)||!(match.getScoreTeam2()>=0)){
+            throw new BusinessException("Para uma partida ser concluída, os placares de ambos os times devem ser informados. Partida ID "+ match.getId());
+        }
+        if (match.getScoreTeam1()==match.getScoreTeam2()){
+            throw new BusinessException("Uma partida de futevolei não pode ser concluída em empate. ID partida: " + match.getId());
+        }
+        if(match.getScoreTeam1()>match.getScoreTeam2()){
+            match.setWinner(match.getTeam1());
+            match.setLoser(match.getTeam2());
+        }
+        if(match.getScoreTeam1()<match.getScoreTeam2()){
+            match.setWinner(match.getTeam2());
+            match.setLoser(match.getTeam1());
+        }
+        return match;
     }
 
     public MatchDto convertEntityToMatch(Match match){
