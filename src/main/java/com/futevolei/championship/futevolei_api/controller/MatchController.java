@@ -1,8 +1,12 @@
 package com.futevolei.championship.futevolei_api.controller;
 
 import com.futevolei.championship.futevolei_api.dto.MatchDto;
+import com.futevolei.championship.futevolei_api.dto.match.MatchUpdateDto;
+import com.futevolei.championship.futevolei_api.dto.player.PlayerDto;
 import com.futevolei.championship.futevolei_api.service.MatchService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,5 +38,17 @@ public class MatchController {
     public ResponseEntity<MatchDto> findById(@PathVariable Long id){
         MatchDto resultMatchDtoToFind = matchService.findById(id);
         return ResponseEntity.ok().body(resultMatchDtoToFind);
+    }
+
+    @Operation(summary = "Update an specific match",
+            description = "Endpoint to update an specific match")
+    @ApiResponse(responseCode = "200",
+            description = "Successfully updated an specific match",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = MatchDto.class)))
+    @PatchMapping(value = "/{id}")
+    public ResponseEntity<MatchDto> updateMatch(@PathVariable Long id, @RequestBody MatchUpdateDto matchUpdateDto){
+        MatchDto resultMatchDtoToUpdate = matchService.updateMatch(id, matchUpdateDto);
+        return ResponseEntity.ok().body(resultMatchDtoToUpdate);
     }
 }
